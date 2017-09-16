@@ -11,28 +11,23 @@ var pass = "***REMOVED***"
 function sendToBackend(text) {
   var req = new XMLHttpRequest();
 
-  console.log('Making request to', url);
+  console.log('Making request to', BLUEMIX_NLP);
 
   const payload = {
     text,
-    features: {
-      concepts: {
-        "emotion": true,
-        "sentiment": true,
-        "limit": 3
+    "features": {
+      "entities": {
+        "sentiment": true
       },
-      categories: {
-        "emotion": true,
-        "sentiment": true,
-        "limit": 3
-      },
-      keywords: {
+      "concepts": {},
+      "categories": {},
+      "keywords": {
         "emotion": true,
         "sentiment": true,
         "limit": 3
       }
     }
-  }
+  };
   req.open("POST", BLUEMIX_NLP, false);
   req.setRequestHeader("Authorization", "Basic " + btoa(user + ":" + pass));
   req.send(JSON.stringify(payload));
