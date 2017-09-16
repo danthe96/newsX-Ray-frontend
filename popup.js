@@ -1,4 +1,3 @@
-import {getKeywords} from './api/bluemixNLP'
 /**
  * Get the current URL.
  *
@@ -67,9 +66,7 @@ const selectors = {
 /**
  *
  */
-function extractText(host, callback) {
-  const selector = selectors[host].body;
-
+function extractText(selector, callback) {
   const extractor = (selector) => {
     const nodes = Array.prototype.slice.call(document.querySelectorAll(selector));
     console.log('nodes', nodes);
@@ -165,7 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
     host = hostForUrl(url);
     if(host in selectors) {
       document.getElementById('unsupportedNotice').style.display = 'none';
-      extractText(host, sendToBackend);
+      extractText(selectors[host].body, sendToBackend);
     } else {
       document.getElementById('defaultIcon').style.display = '';
       document.getElementById('unsupportedNotice').style.display = 'block';
