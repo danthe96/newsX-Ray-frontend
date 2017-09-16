@@ -32,7 +32,6 @@ function sendToBackend(text) {
   req.send(JSON.stringify(payload));
 
   console.log('res', req.responseText, '/res');
-  debugger;
   var bluemixNLP = JSON.parse(req.responseText);
   console.log(bluemixNLP)
 
