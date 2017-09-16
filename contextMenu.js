@@ -76,9 +76,23 @@ function processContextMenuClick(info) {
 }
 
 function sendToOpenCalais(text) {
-  req.open("POST", BLUEMIX_NLP, false);
-  req.setRequestHeader("Authorization", "Basic " + btoa(user + ":" + pass));
+  var payload = {
+    text: text
+  };
+  req = new XMLHttpRequest();
+  req.open("POST", OPEN_CALAIS_TAGGING, false);
+  req.setRequestHeader("outputFormat", "application/json");
+  req.setRequestHeader("x-ag-access-token", "***REMOVED***");
   req.send(JSON.stringify(payload));
+
+  var openCalaisInfo = JSON.parse(req.responseText);
+  console.log(openCalaisInfo);
+
+  Object.keys(openCalaisInfo).forEach((key) => {
+    if (key !== 'doc' && openCalaisInfo[key]._typeGroup === "entities") {
+      console.log(openCalaisInfo[key].name, openCalaisInfo[key])
+    }
+  });
 }
 
 chrome.contextMenus.onClicked.addListener(processContextMenuClick);
