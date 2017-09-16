@@ -19,7 +19,9 @@
   "permissions": [
     "activeTab",
     "storage",
-    "contextMenus"
+    "contextMenus",
+    "https://gateway.watsonplatform.net/*",
+    "http://rmb.reuters.com/*"
   ],
   "background": {
     "persistent": false,
