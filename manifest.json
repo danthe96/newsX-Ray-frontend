@@ -11,6 +11,11 @@
   },
   "permissions": [
     "activeTab",
-    "storage"
-  ]
+    "storage",
+    "contextMenus"
+  ],
+  "background": {
+    "persistent": false,
+    "scripts": ["contextMenu.js"]
+  }
 }
