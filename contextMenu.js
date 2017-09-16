@@ -15,7 +15,6 @@ var pass = "***REMOVED***"
 function sendToBackend(text, callback) {
   var req = new XMLHttpRequest();
 
-  /*
   console.log('Making request to', BLUEMIX_NLP);
 
   const payload = {
@@ -67,7 +66,6 @@ function sendToBackend(text, callback) {
   if(reutersInfo && reutersInfo.results.numFound > 0) {
     reutersInfo.results.result.forEach(function(result) {
       console.log(result.headline);
-      */
 
       req = new XMLHttpRequest();
       reutersApiCall = REUTERS_ITEM_API + `&id=${REUTERS_ITEM_ID_TEMP}`
@@ -101,12 +99,10 @@ function sendToBackend(text, callback) {
         if(callback) callback(result); else console.log(result);
       });
       // query end
-      /*
     });
   } else {
     console.log("Reuters did not return anything")
   }
-  */
 }
 
 function processContextMenuClick(info) {
