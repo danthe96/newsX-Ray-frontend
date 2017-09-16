@@ -6,14 +6,14 @@ var REUTERS_API = "http://rmb.reuters.com/rmd/rest/json/search?mediaType=T&langu
 var user = "***REMOVED***";
 var pass = "***REMOVED***"
 
-function sendToBackend(info, tab) {
-  console.log(info.selectionText)
+function sendToBackend(text) {
   var req = new XMLHttpRequest();
 
-  req.open("GET", BLUEMIX_NLP + info.selectionText, false);
+  req.open("GET", BLUEMIX_NLP + encodeURIComponent(text), false);
   req.setRequestHeader("Authorization", "Basic " + btoa(user + ":" + pass));
   req.send();
 
+  console.log(req.responseText);
   var bluemixNLP = JSON.parse(req.responseText);
   console.log(bluemixNLP)
 
@@ -40,10 +40,15 @@ function sendToBackend(info, tab) {
   reutersInfo.results.result.forEach(function(result) {
     console.log(result.headline)
   });
-
 }
 
-chrome.contextMenus.onClicked.addListener(sendToBackend);
+function processContextMenuClick(info) {
+  const text = info.selectionText;
+  console.log(text);
+  sendToBackend(text);
+}
+
+chrome.contextMenus.onClicked.addListener(processContextMenuClick);
 
 
 chrome.runtime.onInstalled.addListener(function() {

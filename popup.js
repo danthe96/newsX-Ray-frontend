@@ -57,17 +57,12 @@ const selectors = {
 /**
  * 
  */
-function extractText(host) {
+function extractText(host, callback) {
   const selector = selectors[host];
-  const callback = (array) => {
-    //hideSpinner();
-    //document.body.innerHTML = array.concat('\n');
-    console.log(array);
-  };
 
   const extractor = (selector) => {
     const nodes = Array.prototype.slice.call(document.querySelectorAll(selector));
-    let idNum = 0;
+    console.log('nodes', nodes);
     return nodes.map(p=>p.textContent);
   };
 
@@ -128,12 +123,19 @@ function showProgressText(text) {
   node.innerText = text;
 }
 
+function sendToBackend(result) {
+  const paragraphs = result[0];   // no idea
+  const textJoined = paragraphs.join(" ");
+  chrome.extension.getBackgroundPage().sendToBackend(textJoined);
+};
+
 document.addEventListener('DOMContentLoaded', () => {
+
   getCurrentTabUrl((url) => {    
     const host = hostForUrl(url);
     if(host in selectors) {
       showSpinner();
-      extractText(host);
+      extractText(host, sendToBackend);
     } else {
       document.getElementById('unsupportedNotice').style.display = 'block';
     }
