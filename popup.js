@@ -51,10 +51,10 @@ function getCurrentTabUrl(callback) {
  * 
  */
 function extractNYTStory() {
-  var script = `$x('//*[@id="story"]//p[contains(@class, "story-content")]//text()').`;
+  var script = `$x('//*[@id="story"]//p[contains(@class, "story-content")]//text()')`;
 
   var callback = (result) => {
-    alert(result);
+    console.log(result);
   };
   chrome.tabs.executeScript({
     code: script
@@ -119,22 +119,10 @@ function saveBackgroundColor(url, color) {
 // user devices.
 document.addEventListener('DOMContentLoaded', () => {
   getCurrentTabUrl((url) => {
-    var dropdown = document.getElementById('dropdown');
-
-    // Load the saved background color for this page and modify the dropdown
-    // value, if needed.
-    getSavedBackgroundColor(url, (savedColor) => {
-      if (savedColor) {
-        changeBackgroundColor(savedColor);
-        dropdown.value = savedColor;
-      }
-    });
-
-    // Ensure the background color is changed and saved when the dropdown
-    // selection changes.
-    dropdown.addEventListener('change', () => {
-      changeBackgroundColor(dropdown.value);
-      saveBackgroundColor(url, dropdown.value);
+    var button = document.getElementById('extract');
+    
+    button.addEventListener('click', () => {
+      extractNYTStory();
     });
   });
 });
