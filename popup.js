@@ -48,6 +48,20 @@ function getCurrentTabUrl(callback) {
 }
 
 /**
+ * 
+ */
+function extractNYTStory() {
+  var script = `$x('//*[@id="story"]//p[contains(@class, "story-content")]//text()').`;
+
+  var callback = (result) => {
+    alert(result);
+  };
+  chrome.tabs.executeScript({
+    code: script
+  }, callback);
+}
+
+/**
  * Change the background color of the current page.
  *
  * @param {string} color The new background color.
