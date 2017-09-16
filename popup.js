@@ -125,7 +125,7 @@ function showProgressText(text) {
 
 function sendToBackend(result) {
   const paragraphs = result[0];   // no idea
-  const textJoined = paragraphs.join(" ");
+  const textJoined = paragraphs.join(" ").replace("\n", " ");
   chrome.extension.getBackgroundPage().sendToBackend(textJoined);
 };
 

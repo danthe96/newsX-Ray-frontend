@@ -1,5 +1,7 @@
+var OPEN_CALAIS_TAGGING = "https://api.thomsonreuters.com/permid/calais"
+
 var BLUEMIX_NLP =
-  "https://gateway.watsonplatform.net/natural-language-understanding/api/v1/analyze?version=2017-02-27&features=concepts,entities,emotion,keywords,sentiment&text="
+  "https://gateway.watsonplatform.net/natural-language-understanding/api/v1/analyze?version=2017-02-27"
 
 var REUTERS_API = "http://rmb.reuters.com/rmd/rest/json/search?mediaType=T&language=de&token=0Uar2fCpykWL+Yi+Q9MFJlBqVn4owE8q81kIX5wuiTI=&sort=score&dateRange=2017.09.15.00.00&q=body%3A"
 
@@ -9,11 +11,34 @@ var pass = "***REMOVED***"
 function sendToBackend(text) {
   var req = new XMLHttpRequest();
 
-  req.open("GET", BLUEMIX_NLP + encodeURIComponent(text), false);
-  req.setRequestHeader("Authorization", "Basic " + btoa(user + ":" + pass));
-  req.send();
+  console.log('Making request to', url);
 
-  console.log(req.responseText);
+  const payload = {
+    text,
+    features: {
+      concepts: {
+        "emotion": true,
+        "sentiment": true,
+        "limit": 3
+      },
+      categories: {
+        "emotion": true,
+        "sentiment": true,
+        "limit": 3
+      },
+      keywords: {
+        "emotion": true,
+        "sentiment": true,
+        "limit": 3
+      }
+    }
+  }
+  req.open("POST", BLUEMIX_NLP, false);
+  req.setRequestHeader("Authorization", "Basic " + btoa(user + ":" + pass));
+  req.send(JSON.stringify(payload));
+
+  console.log('res', req.responseText, '/res');
+  debugger;
   var bluemixNLP = JSON.parse(req.responseText);
   console.log(bluemixNLP)
 
@@ -54,6 +79,12 @@ function processContextMenuClick(info) {
   const text = info.selectionText;
   console.log(text);
   sendToBackend(text);
+}
+
+function sendToOpenCalais(text) {
+  req.open("POST", BLUEMIX_NLP, false);
+  req.setRequestHeader("Authorization", "Basic " + btoa(user + ":" + pass));
+  req.send(JSON.stringify(payload));
 }
 
 chrome.contextMenus.onClicked.addListener(processContextMenuClick);
