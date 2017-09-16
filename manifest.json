@@ -1,0 +1,16 @@
+{
+  "manifest_version": 2,
+
+  "name": "News X-Ray",
+  "description": "This extension allows to gain unique insights in how far news articles were taken from Reuters articles.",
+  "version": "0.1",
+
+  "browser_action": {
+    "default_icon": "icon.png",
+    "default_popup": "popup.html"
+  },
+  "permissions": [
+    "activeTab",
+    "storage"
+  ]
+}
