@@ -19,7 +19,7 @@ function makeBluemixRequest(payload) {
   return bluemixNLP;
 }
 
-export const getKeywords = (text) => {
+const getKeywords = (text) => {
     const payload = {
       text,
       "features": {
@@ -29,7 +29,7 @@ export const getKeywords = (text) => {
     return makeBluemixRequest(payload);
   };
 
-export const getSentimentsAndEmotion = (text) => {
+const getSentimentsAndEmotion = (text) => {
     const payload = {
       text,
       "features": {
@@ -39,5 +39,3 @@ export const getSentimentsAndEmotion = (text) => {
     };
     return makeBluemixRequest(payload);
 }
-
-export default methods;

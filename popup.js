@@ -1,4 +1,3 @@
-import {getKeywords, getSentimentsAndEmotion} from './api/bluemixNLP'
 /**
  * Get the current URL.
  *
@@ -55,28 +54,34 @@ const selectors = {
     },
     "abcnews.go.com": {
         title: "#article-feed > article > div > header > h1",
-        body: "#article-feed > article:nth-child(1) > div > div.article-body > div > p"
+        body: "#article-feed > article:nth-child(1) > div > div.article-body > div > p",
+        date: 'head > meta[name^="Last-Modified"]',
+        dateParser: node => node.attributes["content"].textContent
     },
-    "www.cbsnews.com": { title: "#article > header > h1",
-        body: "#article-entry > div:nth-child(2) > p" },
-    "www.bbc.com": {
-        title: "#page > div > div.container > div > div.column--primary > div.story-body > h1",
-        body: "#page > div > div.container > div > div.column--primary > div.story-body > div.story-body__inner > p"
+    "theguardian.com": {
+        title: "",
+        body: "",
+        date: "time"
     }
 };
 /**
  *
  */
 function extractText(host, callback) {
-  const selector = selectors[host].body;
+  const selector = selectors[host];
 
-  const extractor = (selector) => {
-    const nodes = Array.prototype.slice.call(document.querySelectorAll(selector));
+  const extractor = (selectorString) => {
+    const selector = JSON.parse(selectorString);
+    const nodes = Array.prototype.slice.call(document.querySelectorAll(selector.body));
     console.log('nodes', nodes);
-    return nodes.map(p=>p.textContent);
+    const paragraphs = nodes.map(p=>p.textContent);
+    const title = document.querySelector(selector.title).textContent;
+    const dateNode = document.querySelector(selector.date || "time");
+    const date = selector.dateParser ? selector.dateParser(dateNode) : dateNode.attributes["datetime"].textContent;
+    return {paragraphs, title, date};
   };
 
-  const script = `(${extractor.toString()})('${selector}')`;
+  const script = `(${extractor.toString()})('${JSON.stringify(selector)}')`;
   chrome.tabs.executeScript({
     code: script
   }, callback);
@@ -178,7 +183,8 @@ function showProgressText(text) {
 }
 let host = null;
 function sendToBackend(result) {
-  const paragraphs = result[0];   // no idea
+  const {paragraphs, title, date} = result[0];   // no idea
+  debugger;
   if(paragraphs.length > 0){
       document.getElementById('notInArticleNotice').style.display = 'none';
       document.getElementById('defaultIcon').style.display = 'none';

@@ -4,7 +4,7 @@ const REUTERS_TOKEN = "***REMOVED***"
 const REUTERS_API = `http://rmb.reuters.com/rmd/rest/json/search?mediaType=T&language=de&token=${REUTERS_TOKEN}&sort=score&dateRange=2017.09.15.00.00&q=body%3A`
 const REUTERS_ITEM_API = `http://rmb.reuters.com/rmd/rest/json/item?token=${REUTERS_TOKEN}`
 
-export const searchReutersArticleByKeywordAndDate = (blueMixKeywords, date) => {
+const searchReutersArticleByKeywordAndDate = (blueMixKeywords, date) => {
   const req = new XMLHttpRequest();
   let query = ""
 
