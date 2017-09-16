@@ -26,7 +26,12 @@ function sendToBackend(text, callback) {
       "keywords": {
         "emotion": true,
         "sentiment": true
-      }
+      },
+      "concepts": {},
+      "emotion": {},
+      "sentiment": {},
+      "categories":{},
+
     }
   };
   req.open("POST", BLUEMIX_NLP, false);
@@ -34,7 +39,6 @@ function sendToBackend(text, callback) {
   req.setRequestHeader("Authorization", "Basic " + btoa(user + ":" + pass));
   req.send(JSON.stringify(payload));
 
-  console.log('res', req.responseText, '/res');
   var bluemixNLP = JSON.parse(req.responseText);
   console.log(bluemixNLP)
 

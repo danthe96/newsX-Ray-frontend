@@ -1,7 +1,4 @@
-// Copyright (c) 2014 The Chromium Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
-
+import {getKeywords} from './api/bluemixNLP'
 /**
  * Get the current URL.
  *
@@ -48,17 +45,17 @@ function getCurrentTabUrl(callback) {
 }
 
 const selectors = {
-  "www.nytimes.com": "#story div.story-body > p",
-  "www.foxnews.com": "#doc > div.page-content > main > section > article > div > div.article-body > p",
-  "abcnews.go.com": "#article-feed > article:nth-child(1) > div > div.article-body > div > p",
-  "www.cbsnews.com": "#article-entry > div:nth-child(2) > p",
-  "www.bbc.com": "#page > div > div.container > div > div.column--primary > div.story-body > div.story-body__inner > p"
+  "www.nytimes.com": {title: "#headline", body: "#story div.story-body > p"},
+  "www.foxnews.com": {title: "#doc > div.page-content > main > section > article > header > h1", body: "#doc > div.page-content > main > section > article > div > div.article-body > p"},
+  "abcnews.go.com": {title: "#article-feed > article > div > header > h1", body: "#article-feed > article:nth-child(1) > div > div.article-body > div > p"},
+  "www.cbsnews.com": {title: "#article > header > h1", body: "#article-entry > div:nth-child(2) > p"},
+  "www.bbc.com": {title: "#page > div > div.container > div > div.column--primary > div.story-body > h1", body: "#page > div > div.container > div > div.column--primary > div.story-body > div.story-body__inner > p"}
 }
 /**
- * 
+ *
  */
 function extractText(host, callback) {
-  const selector = selectors[host];
+  const selector = selectors[host].body;
 
   const extractor = (selector) => {
     const nodes = Array.prototype.slice.call(document.querySelectorAll(selector));
@@ -80,60 +77,19 @@ function hostForUrl(urlString) {
 function highlightText(text, transparency, altText) {
   const replacer = (text, transparency, altText) => {
     const tooltipHtml = altText ? `data-balloon="${altText}" data-balloon-pos="up" data-balloon-length="xlarge"` : "";
-    const addedText = `<span style="background-color: rgba(255, 187, 0, ${transparency})" ${tooltipHtml}>Similarity: ${100*transparency}%<br/>Original text: \"${text}\"</span>`;
-    document.body.innerHTML = document.body.innerHTML.replace(text, addedText);
+    const leading = `<span style="background-color: rgba(255, 187, 0, ${transparency})" ${tooltipHtml}>`;
+    const trailing = "</span>";
+    // world-class replacement logic right here
+    const threshold = 17;
+    const leadingText = text.slice(0, threshold);
+    const trailingText = text.slice(-threshold);
+    document.body.innerHTML = document.body.innerHTML.replace(leadingText, leading+leadingText);
+    document.body.innerHTML = document.body.innerHTML.replace(trailingText, trailingText+trailing);
   };
   const script = `(${replacer.toString()})("${text.replace('"', '\\"').replace('\'', '\\\'')}", ${transparency}, "${altText}")`;
   chrome.tabs.executeScript({
     code: script
   }, null);
-}
-
-const BLUEMIX_NLP = "https://gateway.watsonplatform.net/natural-language-understanding/api/v1/analyze?version=2017-02-27"
-var user = "***REMOVED***";
-var pass = "***REMOVED***"
-
-function appendSentimentAnalysis(newsAdditions, selectorForArticleParagraphs){
-  if(newsAdditions.length == 0){
-    return;
-  }
-
-  const payload = {
-    "text": newsAdditions.join(''),
-    "features": {
-      "targets": {
-        "emotion": true,
-        "sentiment": true
-      },
-      "keywords": {
-        "emotion": true,
-        "sentiment": true
-      }
-    }
-  };
-  req.open("POST", BLUEMIX_NLP, false);
-  req.setRequestHeader("Content-type", "application/json");
-  req.setRequestHeader("Authorization", "Basic " + btoa(user + ":" + pass));
-  req.send(JSON.stringify(payload));
-
-  console.log('res', req.responseText, '/res');
-  var bluemixNLP = JSON.parse(req.responseText);
-
-  const appender = (newsAdditions, selector) => {
-    const nodes = document.querySelectorAll(selector);
-    const last = nodes[nodes.length - 1];
-    const parent = last.parentNode;
-
-    `The information added by the newspaper is ${sentiment}`
-
-    const sentimentText = document.createElement("h3");
-    sentiment.appendChild(document.createTextNode(sentimentResult));
-    parent.appendChild(h1);
-  };
-
-  const code = `(${appender.toString()})(${JSON.stringify(newsAdditions)}, "${selectorForArticleParagraphs}")`;
-  console.log(code);
-  chrome.tabs.executeScript({code});
 }
 
 function appendOmittedText(paragraphs, selectorForArticleParagraphs) {
@@ -152,6 +108,7 @@ function appendOmittedText(paragraphs, selectorForArticleParagraphs) {
     parent.appendChild(h1);
 
     const quote = document.createElement("blockquote");
+    quote.className = "xRay-omitted";
     paragraphs.forEach(text=>{
       const p = document.createElement("p");
       p.appendChild(document.createTextNode(text));
@@ -186,15 +143,13 @@ function sendToBackend(result) {
     console.log('final result', result);
     result.matched_sentences.forEach(r=>highlightText(r.news_sentence, r.score, r.reuters_sentence));
     appendOmittedText(result.omitted_sentences, selectors[host]);
-    appendSentimentAnalysis(result.news_additions, selectors[host]);
+    hideSpinner();
   });
 };
 
 document.addEventListener('DOMContentLoaded', () => {
-
-  getCurrentTabUrl((url) => {   
+  getCurrentTabUrl((url) => {
     host = hostForUrl(url);
-
     if(host in selectors) {
       document.getElementById('unsupportedNotice').style.display = 'none';
       extractText(host, sendToBackend);
@@ -202,7 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('defaultIcon').style.display = '';
       document.getElementById('unsupportedNotice').style.display = 'block';
     }
-    
+
   });
 
   // test
