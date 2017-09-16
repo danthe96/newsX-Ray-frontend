@@ -51,8 +51,15 @@ function getCurrentTabUrl(callback) {
  * 
  */
 function extractNYTStory() {
-  var script = `$x('//*[@id="story"]//p[contains(@class, "story-content")]//text()')`;
-
+  var xPath = '//*[@id="story"]//p[contains(@class, "story-content")]//text()';
+  var script = `() => {let results = [];
+  let query = document.evaluate('${xPath}', document.body, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+  for (let i=0, length=query.snapshotLength; i<length; ++i) {
+    results.push(query.snapshotItem(i));
+  }
+  return results
+}`;
+var script2 = `$x('${xPath}')`;
   var callback = (result) => {
     console.log(result);
   };
