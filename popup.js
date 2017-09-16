@@ -1,7 +1,4 @@
-// Copyright (c) 2014 The Chromium Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
-
+import {getKeywords} from './api/bluemixNLP'
 /**
  * Get the current URL.
  *
@@ -48,17 +45,17 @@ function getCurrentTabUrl(callback) {
 }
 
 const selectors = {
-  "www.nytimes.com": "#story div.story-body > p",
-  "www.foxnews.com": "#doc > div.page-content > main > section > article > div > div.article-body > p",
-  "abcnews.go.com": "#article-feed > article:nth-child(1) > div > div.article-body > div > p",
-  "www.cbsnews.com": "#article-entry > div:nth-child(2) > p",
-  "www.bbc.com": "#page > div > div.container > div > div.column--primary > div.story-body > div.story-body__inner > p"
+  "www.nytimes.com": {title: "#headline", body: "#story div.story-body > p"},
+  "www.foxnews.com": {title: "#doc > div.page-content > main > section > article > header > h1", body: "#doc > div.page-content > main > section > article > div > div.article-body > p"},
+  "abcnews.go.com": {title: "#article-feed > article > div > header > h1", body: "#article-feed > article:nth-child(1) > div > div.article-body > div > p"},
+  "www.cbsnews.com": {title: "#article > header > h1", body: "#article-entry > div:nth-child(2) > p"},
+  "www.bbc.com": {title: "#page > div > div.container > div > div.column--primary > div.story-body > h1", body: "#page > div > div.container > div > div.column--primary > div.story-body > div.story-body__inner > p"}
 }
 /**
- * 
+ *
  */
 function extractText(host, callback) {
-  const selector = selectors[host];
+  const selector = selectors[host].body;
 
   const extractor = (selector) => {
     const nodes = Array.prototype.slice.call(document.querySelectorAll(selector));
@@ -143,10 +140,8 @@ function sendToBackend(result) {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
-
-  getCurrentTabUrl((url) => {   
+  getCurrentTabUrl((url) => {
     host = hostForUrl(url);
-
     if(host in selectors) {
       document.getElementById('unsupportedNotice').style.display = 'none';
       extractText(host, sendToBackend);
@@ -154,7 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('defaultIcon').style.display = '';
       document.getElementById('unsupportedNotice').style.display = 'block';
     }
-    
+
   });
 
   // test
