@@ -1,0 +1,24 @@
+.xray-spinner {
+    position: relative;
+    top: 60px;
+    left: 60px;
+    width: 120px;
+    height: 120px;
+    margin: -30px 0 0 -120px;
+}
+.spin {
+    -webkit-animation:spin 4s linear infinite;
+    -moz-animation:spin 4s linear infinite;
+    animation:spin 4s linear infinite;
+}
+.spin-rev {
+    -webkit-animation:antispin 4s linear infinite;
+    -moz-animation:antispin 4s linear infinite;
+    animation:antispin 4s linear infinite;
+}
+@-moz-keyframes spin { 100% { -moz-transform: rotate(360deg); } }
+@-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }
+@keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
+@-moz-keyframes antispin { 100% { -moz-transform: rotate(-360deg); } }
+@-webkit-keyframes antispin { 100% { -webkit-transform: rotate(-360deg); } }
+@keyframes antispin { 100% { -webkit-transform: rotate(-360deg); transform:rotate(-360deg); } }

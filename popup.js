@@ -56,6 +56,7 @@ const selectors = {
 function extractText(host) {
   const selector = selectors[host];
   const callback = (array) => {
+    hideSpinner();
     document.body.innerHTML = array.concat('\n');
     console.log(array);
   };

@@ -23,6 +23,7 @@
         justify-content: space-between;
       }
     </style>
+    <link rel="stylesheet" href="spinner.css">
 
     <!--
       - JavaScript and HTML must be in separate files: see our Content Security
@@ -31,12 +32,18 @@
       - [1]: https://developer.chrome.com/extensions/contentSecurityPolicy
     -->
     <script src="popup.js"></script>
+    <script src="spinner.js"></script>
   </head>
 
   <body>
     <h1>News X-Ray</h1>
     <div id="container">
       <button type="button" id="extract">Extract article</button>
+      <br>
+      <div id="spinner-container" style="display:none;">
+        <img class="xray-spinner spin" src="logo.png" alt="Computing..." width="120" height="120">
+        <img class="xray-spinner spin-rev" src="logo.png" alt="Computing..." width="120" height="120">
+      </div>
       <button type="button" id="colorize-test">Test colorizing</button>
     </div>
   </body>
