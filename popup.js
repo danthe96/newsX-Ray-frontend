@@ -56,18 +56,14 @@ const selectors = {
 function extractText(host) {
   const selector = selectors[host];
   const callback = (array) => {
-    //const array = Array.prototype.slice.call(query);
-    //const paragraphs = array.map(x=>x.textContent);
-    document.body.innerHTML = JSON.stringify(array);
+    document.body.innerHTML = array.concat('\n');
     console.log(array);
   };
 
   const extractor = (selector) => {
     const nodes = Array.prototype.slice.call(document.querySelectorAll(selector));
-    return nodes.map(x=>{
-      const text = x.textContent;
-      return {text}
-    });
+    let idNum = 0;
+    return nodes.map(p=>p.textContent);
   };
 
   const script = `(${extractor.toString()})('${selector}')`;
