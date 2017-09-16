@@ -17,18 +17,17 @@ function sendToBackend(text) {
     text,
     "features": {
       "entities": {
+        "emotion": true,
         "sentiment": true
       },
-      "concepts": {},
-      "categories": {},
       "keywords": {
         "emotion": true,
-        "sentiment": true,
-        "limit": 3
+        "sentiment": true
       }
     }
   };
   req.open("POST", BLUEMIX_NLP, false);
+  req.setRequestHeader("Content-type", "application/json");
   req.setRequestHeader("Authorization", "Basic " + btoa(user + ":" + pass));
   req.send(JSON.stringify(payload));
 
