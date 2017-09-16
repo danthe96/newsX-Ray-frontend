@@ -119,32 +119,75 @@ function appendSentimentAnalysis(newsAdditions, selectorForArticleParagraphs){
   var sentimentScore = results["sentiment"]["document"]["score"]
   var sentimentText = `The information added by the newspaper is fairly neutral.`
   const emotions = results["emotion"]["document"]["emotion"]
-  const maxEmotion = Object.keys(obj).reduce(function(a, b){ return obj[a] > obj[b] ? a : b });
-  if(sentimentScore < -0.4){
-    sentimentText = `The information added or the views expressed by the newspaper are very negative, mostly characterized by ${maxEmotion}.`
-  } else if(sentimentScore < -0.1){
-    sentimentText = `The information added or the views expressed by the newspaper are mostly negative.`
-  } else if(sentimentScore > 0.4){
-    entimentText = `The information added or the views expressed by the newspaper are very positive, mostly characterized by ${maxEmotion}.`
-  } else if (sentimentScore > 0.1){
-    sentimentText = `The information added or the views expressed by the newspaper are mostly positive.`
-  }
+  const maxEmotion = Object.keys(emotions).reduce(function(a, b){ return emotions[a] > emotions[b] ? a : b });
 
-  const appender = (selector) => {
-    const nodes = document.querySelectorAll(selector);
-    const last = nodes[nodes.length - 1];
-    const parent = last.parentNode;
+  chrome.storage.sync.get({"sentimentStats": {
+    "sentimentScoreSum": 0,
+    "emotions": {
+      "sadnessSum": 0,
+      "joySum": 0,
+      "fearSum": 0,
+      "disgustSum": 0,
+      "angerSum": 0
+    },
+    "counter": 0
+  }}, (items) => {
+      statistics = items["sentimentStats"]
+      statistics["sentimentScoreSum"] += sentimentScore
+      statistics["emotions"]["sadnessSum"] += emotions["sadness"]
+      statistics["emotions"]["joySum"] += emotions["joy"]
+      statistics["emotions"]["fearSum"] += emotions["fear"]
+      statistics["emotions"]["disgustSum"] += emotions["disgust"]
+      statistics["emotions"]["angerSum"] += emotions["anger"]
+      statistics["counter"] += 1
 
-    `The information added by the newspaper is ${sentiment}`
+      avg_sentiment = statistics["sentimentScoreSum"] / statistics["counter"]
 
-    const sentimentText = document.createElement("h3");
-    sentiment.appendChild(document.createTextNode(sentimentResult));
-    parent.appendChild(h1);
-  };
+      chrome.storage.sync.set({'sentimentStats': statistics}, () => {
 
-  const code = `(${appender.toString()})("${selectorForArticleParagraphs}")`;
-  console.log(code);
-  chrome.tabs.executeScript({code});
+        const maxPastEmotion = Object.keys(statistics["emotions"]).reduce(function(a, b){ return statistics["emotions"][a] > statistics["emotions"][b] ? a : b });
+        if(sentimentScore < -0.4){
+          sentimentText = `The information added or the views expressed by the newspaper are very negative, mostly characterized by ${maxEmotion}.`
+        } else if(sentimentScore < -0.1){
+          sentimentText = `The information added or the views expressed by the newspaper are mostly negative.`
+        } else if(sentimentScore > 0.4){
+          sentimentText = `The information added or the views expressed by the newspaper are very positive, mostly characterized by ${maxEmotion}.`
+        } else if (sentimentScore > 0.1){
+          sentimentText = `The information added or the views expressed by the newspaper are mostly positive.`
+        }
+
+        max_avg_emotions
+        if(sentimentScore < -0.4){
+          sentimentText += `\n Articles by #{host} have been very negative in the past, characterized by ${maxPastEmotion}.`
+        } else if(sentimentScore < -0.1){
+          sentimentText += `\n Articles by #{host} have been mostly negative in the past.`
+        } else if(sentimentScore > 0.4){
+          sentimentText += `\n Articles by #{host} have been very positive in the past, characterized by ${maxPastEmotion}.`
+        } else if (sentimentScore > 0.1){
+          sentimentText += `\n Articles by #{host} have been mostly positive in the past.`
+        } else {
+          sentimentText += `\n Articles by #{host} have been very neutral in the past.`
+        }
+
+        const appender = (selector) => {
+          const nodes = document.querySelectorAll(selector);
+          const last = nodes[nodes.length - 1];
+          const parent = last.parentNode;
+
+          `The information added by the newspaper is ${sentiment}`
+
+          const sentimentText = document.createElement("h3");
+          sentiment.appendChild(document.createTextNode(sentimentResult));
+          parent.appendChild(h1);
+        };
+
+        const code = `(${appender.toString()})("${selectorForArticleParagraphs}")`;
+        console.log(code);
+        chrome.tabs.executeScript({code});
+
+      });
+
+  })
 }
 
 function appendOmittedText(paragraphs, selectorForArticleParagraphs) {
@@ -199,6 +242,7 @@ function sendToBackend(result) {
     console.log('final result', result);
     result.matched_sentences.forEach(r=>highlightText(r.news_sentence, r.score, r.reuters_sentence));
     appendOmittedText(result.omitted_sentences, selectors[host]);
+    appendSentimentAnalysis(result.news_additions, selectors[host]);
     hideSpinner();
   });
 };
