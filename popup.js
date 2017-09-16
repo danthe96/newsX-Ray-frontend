@@ -45,12 +45,25 @@ function getCurrentTabUrl(callback) {
 }
 
 const selectors = {
-  "www.nytimes.com": {title: "#headline", body: "#story div.story-body > p"},
-  "www.foxnews.com": {title: "#doc > div.page-content > main > section > article > header > h1", body: "#doc > div.page-content > main > section > article > div > div.article-body > p"},
-  "abcnews.go.com": {title: "#article-feed > article > div > header > h1", body: "#article-feed > article:nth-child(1) > div > div.article-body > div > p"},
-  "www.cbsnews.com": {title: "#article > header > h1", body: "#article-entry > div:nth-child(2) > p"},
-  "www.bbc.com": {title: "#page > div > div.container > div > div.column--primary > div.story-body > h1", body: "#page > div > div.container > div > div.column--primary > div.story-body > div.story-body__inner > p"}
-}
+    "www.nytimes.com": {
+        title: "#headline",
+        body: "#story div.story-body > p"
+    },
+    "www.foxnews.com": {
+        title: "#doc > div.page-content > main > section > article > header > h1",
+        body: "#doc > div.page-content > main > section > article > div > div.article-body > p"
+    },
+    "abcnews.go.com": {
+        title: "#article-feed > article > div > header > h1",
+        body: "#article-feed > article:nth-child(1) > div > div.article-body > div > p"
+    },
+    "www.cbsnews.com": { title: "#article > header > h1",
+        body: "#article-entry > div:nth-child(2) > p" },
+    "www.bbc.com": {
+        title: "#page > div > div.container > div > div.column--primary > div.story-body > h1",
+        body: "#page > div > div.container > div > div.column--primary > div.story-body > div.story-body__inner > p"
+    }
+};
 /**
  *
  */
