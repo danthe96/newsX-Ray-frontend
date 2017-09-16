@@ -1,6 +1,6 @@
 function showSpinner() {
-    document.getElementById('spinner-container').style.display = 'block';
+    document.getElementById('loadingIndicator').style.display = 'block';
 }
 function hideSpinner() {
-    document.getElementById('spinner-container').style.display = 'none';
+    document.getElementById('loadingIndicator').style.display = 'none';
 }

@@ -38,13 +38,17 @@
   <body>
     <h1>News X-Ray</h1>
     <div id="container">
-      <button type="button" id="extract">Extract article</button>
-      <br>
-      <div id="spinner-container" style="display:none;">
-        <img class="xray-spinner spin" src="logo.png" alt="Computing..." width="120" height="120">
-        <img class="xray-spinner spin-rev" src="logo.png" alt="Computing..." width="120" height="120">
+      <span id="unsupportedNotice" style="display:none;">This page is not supported</span>
+      <div id="loadingIndicator" style="display:none;">
+        <span style="text-align:center;">Analyzing...</span>
+        <!--button type="button" id="extract">Extract article</button-->
+        <br>
+        <div id="spinner-container">
+          <img class="xray-spinner spin" src="logo.png" alt="Computing..." width="120" height="120">
+          <img class="xray-spinner spin-rev" src="logo.png" alt="Computing..." width="120" height="120">
+        </div>
       </div>
-      <button type="button" id="colorize-test">Test colorizing</button>
+      <!--button type="button" id="colorize-test">Test colorizing</button-->
     </div>
   </body>
 </html>

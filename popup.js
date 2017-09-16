@@ -56,8 +56,8 @@ const selectors = {
 function extractText(host) {
   const selector = selectors[host];
   const callback = (array) => {
-    hideSpinner();
-    document.body.innerHTML = array.concat('\n');
+    //hideSpinner();
+    //document.body.innerHTML = array.concat('\n');
     console.log(array);
   };
 
@@ -146,16 +146,13 @@ function saveBackgroundColor(url, color) {
 // chrome.storage.local allows the extension data to be synced across multiple
 // user devices.
 document.addEventListener('DOMContentLoaded', () => {
-  getCurrentTabUrl((url) => {
-    var button = document.getElementById('extract');
-    
+  getCurrentTabUrl((url) => {    
     const host = hostForUrl(url);
     if(host in selectors) {
-      button.addEventListener('click', () => {
-        extractText(host);
-      });
+      showSpinner();
+      extractText(host);
     } else {
-      button.outerHTML = "This page is not supported"
+      document.getElementById('unsupportedNotice').style.display = 'block';
     }
     
   });
