@@ -47,11 +47,14 @@ function getCurrentTabUrl(callback) {
   // alert(url); // Shows "undefined", because chrome.tabs.query is async.
 }
 
+const selectors = {
+  "www.nytimes.com": "#story div.story-body > p"
+}
 /**
  * 
  */
-function extractNYTStory() {
-  const selector = '#story div.story-body > p';
+function extractText(host) {
+  const selector = selectors[host];
   const callback = (array) => {
     //const array = Array.prototype.slice.call(query);
     //const paragraphs = array.map(x=>x.textContent);
@@ -71,6 +74,11 @@ function extractNYTStory() {
   chrome.tabs.executeScript({
     code: script
   }, callback);
+}
+
+function hostForUrl(urlString) {
+  const url = new URL(urlString);
+  return url.hostname;
 }
 
 /**
@@ -133,8 +141,14 @@ document.addEventListener('DOMContentLoaded', () => {
   getCurrentTabUrl((url) => {
     var button = document.getElementById('extract');
     
-    button.addEventListener('click', () => {
-      extractNYTStory();
-    });
+    const host = hostForUrl(url);
+    if(host in selectors) {
+      button.addEventListener('click', () => {
+        extractText(host);
+      });
+    } else {
+      button.outerHTML = "This page is not supported"
+    }
+    
   });
 });
