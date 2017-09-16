@@ -7,23 +7,8 @@
 <html>
   <head>
     <title>Getting Started Extension's Popup</title>
-    <style type="text/css">
-      body {
-        margin: 10px;
-        white-space: nowrap;
-      }
-
-      h1 {
-        font-size: 15px;
-      }
-
-      #container {
-        align-items: center;
-        display: flex;
-        justify-content: space-between;
-      }
-    </style>
     <link rel="stylesheet" href="spinner.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/balloon-css/0.4.0/balloon.min.css">    
 
     <!--
       - JavaScript and HTML must be in separate files: see our Content Security
@@ -33,22 +18,22 @@
     -->
     <script src="popup.js"></script>
     <script src="spinner.js"></script>
+    
   </head>
 
   <body>
     <h1>News X-Ray</h1>
     <div id="container">
-      <span id="unsupportedNotice" style="display:none;">This page is not supported</span>
+      <p id="unsupportedNotice" style="display:none;">This page is not supported</p>
       <div id="loadingIndicator" style="display:none;">
-        <span style="text-align:center;">Analyzing...</span>
         <!--button type="button" id="extract">Extract article</button-->
-        <br>
         <div id="spinner-container">
           <img class="xray-spinner spin" src="logo.png" alt="Computing..." width="120" height="120">
           <img class="xray-spinner spin-rev" src="logo.png" alt="Computing..." width="120" height="120">
         </div>
+        <div id="progressInfo">Analyzing...</div>
       </div>
-      <!--button type="button" id="colorize-test">Test colorizing</button-->
+      <button type="button" id="colorize-test">Test colorizing</button>
     </div>
   </body>
 </html>

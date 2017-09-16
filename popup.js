@@ -82,73 +82,52 @@ function hostForUrl(urlString) {
   return url.hostname;
 }
 
-function makeSpan(text, newClass) {
-  const replacer = (text, newClass) => {
-    const addedText = `<span class="${newClass}">${text}</span>`;
+function highlightText(text, transparency, altText) {
+  const replacer = (text, transparency, altText) => {
+    const tooltipHtml = altText ? `data-balloon="${altText}" data-balloon-pos="up" data-balloon-length="xlarge"` : "";
+    const addedText = `<span style="background-color: rgba(255, 187, 0, ${transparency})" ${tooltipHtml}>${text}</span>`;
     document.body.innerHTML = document.body.innerHTML.replace(text, addedText);
   };
-  const script = `(${replacer.toString()})("${text.replace('"', '\\"').replace('\'', '\\\'')}", "${newClass}")`;
+  const script = `(${replacer.toString()})("${text.replace('"', '\\"').replace('\'', '\\\'')}", ${transparency}, "${altText}")`;
   chrome.tabs.executeScript({
     code: script
   }, null);
 }
 
-/**
- * Change the background color of the current page.
- *
- * @param {string} color The new background color.
- */
-function changeBackgroundColor(color) {
-  var script = 'document.body.style.backgroundColor="' + color + '";';
-  // See https://developer.chrome.com/extensions/tabs#method-executeScript.
-  // chrome.tabs.executeScript allows us to programmatically inject JavaScript
-  // into a page. Since we omit the optional first argument "tabId", the script
-  // is inserted into the active tab of the current window, which serves as the
-  // default.
-  chrome.tabs.executeScript({
-    code: script
-  });
+function appendOmittedText(paragraphs, selectorForArticleParagraphs) {
+  if(paragraphs.length == 0) {
+    return;
+  }
+  const appender = (paragraphs, selector) => {
+    const nodes = document.querySelectorAll(selector);
+    const last = nodes[nodes.length - 1];
+    console.log(last);
+    const parent = last.parentNode;
+
+    const h1 = document.createElement("h1");
+    h1.className = "xray-omissions-title"
+    h1.appendChild(document.createTextNode("Omitted text"));
+    parent.appendChild(h1);
+
+    const quote = document.createElement("blockquote");
+    paragraphs.forEach(text=>{
+      const p = document.createElement("p");
+      p.appendChild(document.createTextNode(text));
+      quote.appendChild(p);
+    });
+    parent.appendChild(quote);
+  };
+
+  const code = `(${appender.toString()})(${JSON.stringify(paragraphs)}, "${selectorForArticleParagraphs}")`;
+  console.log(code);
+  chrome.tabs.executeScript({code});
 }
 
-/**
- * Gets the saved background color for url.
- *
- * @param {string} url URL whose background color is to be retrieved.
- * @param {function(string)} callback called with the saved background color for
- *     the given url on success, or a falsy value if no color is retrieved.
- */
-function getSavedBackgroundColor(url, callback) {
-  // See https://developer.chrome.com/apps/storage#type-StorageArea. We check
-  // for chrome.runtime.lastError to ensure correctness even when the API call
-  // fails.
-  chrome.storage.sync.get(url, (items) => {
-    callback(chrome.runtime.lastError ? null : items[url]);
-  });
+function showProgressText(text) {
+  const node = document.getElementById("progressInfo");
+  node.innerText = text;
 }
 
-/**
- * Sets the given background color for url.
- *
- * @param {string} url URL for which background color is to be saved.
- * @param {string} color The background color to be saved.
- */
-function saveBackgroundColor(url, color) {
-  var items = {};
-  items[url] = color;
-  // See https://developer.chrome.com/apps/storage#type-StorageArea. We omit the
-  // optional callback since we don't need to perform any action once the
-  // background color is saved.
-  chrome.storage.sync.set(items);
-}
-
-// This extension loads the saved background color for the current tab if one
-// exists. The user can select a new background color from the dropdown for the
-// current page, and it will be saved as part of the extension's isolated
-// storage. The chrome.storage API is used for this purpose. This is different
-// from the window.localStorage API, which is synchronous and stores data bound
-// to a document's origin. Also, using chrome.storage.sync instead of
-// chrome.storage.local allows the extension data to be synced across multiple
-// user devices.
 document.addEventListener('DOMContentLoaded', () => {
   getCurrentTabUrl((url) => {    
     const host = hostForUrl(url);
@@ -164,6 +143,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // test
   const colorButton = document.getElementById('colorize-test');
   colorButton.addEventListener('click', () => {
-    makeSpan('The', 'reuters');
+    highlightText('headquarters', 0.9, 'Think differentThink differentThink differentThink differentThink different');
   });
 });
