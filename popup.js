@@ -1,4 +1,4 @@
-import {getKeywords} from './api/bluemixNLP'
+import {getKeywords, getSentimentsAndEmotion} from './api/bluemixNLP'
 /**
  * Get the current URL.
  *
@@ -103,6 +103,43 @@ function highlightText(text, transparency, altText) {
   chrome.tabs.executeScript({
     code: script
   }, null);
+}
+
+function appendSentimentAnalysis(newsAdditions, selectorForArticleParagraphs){
+  if(newsAdditions.length == 0){
+    return;
+  }
+
+  results = getSentimentsAndEmotion(newsAdditions.join(' '));
+  var sentimentScore = results["sentiment"]["document"]["score"]
+  var sentimentText = `The information added by the newspaper is fairly neutral.`
+  const emotions = results["emotion"]["document"]["emotion"]
+  const maxEmotion = Object.keys(obj).reduce(function(a, b){ return obj[a] > obj[b] ? a : b });
+  if(sentimentScore < -0.4){
+    sentimentText = `The information added or the views expressed by the newspaper are very negative, mostly characterized by ${maxEmotion}.`
+  } else if(sentimentScore < -0.1){
+    sentimentText = `The information added or the views expressed by the newspaper are mostly negative.`
+  } else if(sentimentScore > 0.4){
+    entimentText = `The information added or the views expressed by the newspaper are very positive, mostly characterized by ${maxEmotion}.`
+  } else if (sentimentScore > 0.1){
+    sentimentText = `The information added or the views expressed by the newspaper are mostly positive.`
+  }
+
+  const appender = (selector) => {
+    const nodes = document.querySelectorAll(selector);
+    const last = nodes[nodes.length - 1];
+    const parent = last.parentNode;
+
+    `The information added by the newspaper is ${sentiment}`
+
+    const sentimentText = document.createElement("h3");
+    sentiment.appendChild(document.createTextNode(sentimentResult));
+    parent.appendChild(h1);
+  };
+
+  const code = `(${appender.toString()})("${selectorForArticleParagraphs}")`;
+  console.log(code);
+  chrome.tabs.executeScript({code});
 }
 
 function appendOmittedText(paragraphs, selectorForArticleParagraphs) {
