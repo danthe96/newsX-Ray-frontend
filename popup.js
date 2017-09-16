@@ -58,9 +58,9 @@ const selectors = {
         date: 'head > meta[name^="Last-Modified"]',
         dateParser: node => node.attributes["content"].textContent
     },
-    "theguardian.com": {
-        title: "",
-        body: "",
+    "www.theguardian.com": {
+        title: "#article > div.hide-on-mobile > header > div.content__header.tonal__header > div > div > h1",
+        body: "#article > div > div > div > div.js-article__body > p",
         date: "time"
     }
 };
