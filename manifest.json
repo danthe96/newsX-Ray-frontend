@@ -26,9 +26,7 @@
   "background": {
     "persistent": false,
     "scripts": [
-      "contextMenu.js",
-      "api/bluemix.js",
-      "api/reuters.js"
+      "contextMenu.js"
     ]
   }
 }
