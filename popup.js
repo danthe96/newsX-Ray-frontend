@@ -51,24 +51,23 @@ function getCurrentTabUrl(callback) {
  * 
  */
 function extractNYTStory() {
-  var xPath = '//*[@id="story"]//p[contains(@class, "story-content")]//text()';
-  var script3 = `() => {let results = [];
-    Array.prototype.slice.call(document.querySelectorAll('#story div.story-body > p')).map(x=>x.textContent)
-}`;
   const selector = '#story div.story-body > p';
-  const extract = () => {
-    const query = document.querySelectorAll('#story div.story-body > p')
-    const array = Array.prototype.slice.call(document.querySelectorAll('#story div.story-body > p'));
-    const paragraphs = array.map(x=>x.textContent);
-    alert(paragraphs);
-    return paragraphs;
+  const callback = (array) => {
+    //const array = Array.prototype.slice.call(query);
+    //const paragraphs = array.map(x=>x.textContent);
+    document.body.innerHTML = JSON.stringify(array);
+    console.log(array);
   };
-  const script = extract.toString();
-var script2 = `$x('${xPath}')`;
-  var callback = (result) => {
-    document.appendChild(result);
-    console.log(result);
+
+  const extractor = (selector) => {
+    const nodes = Array.prototype.slice.call(document.querySelectorAll(selector));
+    return nodes.map(x=>{
+      const text = x.textContent;
+      return {text}
+    });
   };
+
+  const script = `(${extractor.toString()})('${selector}')`;
   chrome.tabs.executeScript({
     code: script
   }, callback);
