@@ -108,6 +108,7 @@ function appendOmittedText(paragraphs, selectorForArticleParagraphs) {
     parent.appendChild(h1);
 
     const quote = document.createElement("blockquote");
+    quote.className = "xRay-omitted";
     paragraphs.forEach(text=>{
       const p = document.createElement("p");
       p.appendChild(document.createTextNode(text));
