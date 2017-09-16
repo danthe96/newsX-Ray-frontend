@@ -80,13 +80,60 @@ function hostForUrl(urlString) {
 function highlightText(text, transparency, altText) {
   const replacer = (text, transparency, altText) => {
     const tooltipHtml = altText ? `data-balloon="${altText}" data-balloon-pos="up" data-balloon-length="xlarge"` : "";
-    const addedText = `<span style="background-color: rgba(255, 187, 0, ${transparency})" ${tooltipHtml}>${text}</span>`;
+    const addedText = `<span style="background-color: rgba(255, 187, 0, ${transparency})" ${tooltipHtml}>Similarity: ${100*transparency}%<br/>Original text: \"${text}\"</span>`;
     document.body.innerHTML = document.body.innerHTML.replace(text, addedText);
   };
   const script = `(${replacer.toString()})("${text.replace('"', '\\"').replace('\'', '\\\'')}", ${transparency}, "${altText}")`;
   chrome.tabs.executeScript({
     code: script
   }, null);
+}
+
+const BLUEMIX_NLP = "https://gateway.watsonplatform.net/natural-language-understanding/api/v1/analyze?version=2017-02-27"
+var user = "***REMOVED***";
+var pass = "***REMOVED***"
+
+function appendSentimentAnalysis(newsAdditions, selectorForArticleParagraphs){
+  if(newsAdditions.length == 0){
+    return;
+  }
+
+  const payload = {
+    "text": newsAdditions.join(''),
+    "features": {
+      "targets": {
+        "emotion": true,
+        "sentiment": true
+      },
+      "keywords": {
+        "emotion": true,
+        "sentiment": true
+      }
+    }
+  };
+  req.open("POST", BLUEMIX_NLP, false);
+  req.setRequestHeader("Content-type", "application/json");
+  req.setRequestHeader("Authorization", "Basic " + btoa(user + ":" + pass));
+  req.send(JSON.stringify(payload));
+
+  console.log('res', req.responseText, '/res');
+  var bluemixNLP = JSON.parse(req.responseText);
+
+  const appender = (newsAdditions, selector) => {
+    const nodes = document.querySelectorAll(selector);
+    const last = nodes[nodes.length - 1];
+    const parent = last.parentNode;
+
+    `The information added by the newspaper is ${sentiment}`
+
+    const sentimentText = document.createElement("h3");
+    sentiment.appendChild(document.createTextNode(sentimentResult));
+    parent.appendChild(h1);
+  };
+
+  const code = `(${appender.toString()})(${JSON.stringify(newsAdditions)}, "${selectorForArticleParagraphs}")`;
+  console.log(code);
+  chrome.tabs.executeScript({code});
 }
 
 function appendOmittedText(paragraphs, selectorForArticleParagraphs) {
@@ -139,6 +186,7 @@ function sendToBackend(result) {
     console.log('final result', result);
     result.matched_sentences.forEach(r=>highlightText(r.news_sentence, r.score, r.reuters_sentence));
     appendOmittedText(result.omitted_sentences, selectors[host]);
+    appendSentimentAnalysis(result.news_additions, selectors[host]);
   });
 };
 

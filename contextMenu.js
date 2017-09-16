@@ -1,7 +1,6 @@
 var OPEN_CALAIS_TAGGING = "https://api.thomsonreuters.com/permid/calais"
 
-var BLUEMIX_NLP =
-  "https://gateway.watsonplatform.net/natural-language-understanding/api/v1/analyze?version=2017-02-27"
+var BLUEMIX_NLP = "https://gateway.watsonplatform.net/natural-language-understanding/api/v1/analyze?version=2017-02-27"
 
 const REUTERS_ITEM_ID_TEMP = "tag:reuters.com,2017:newsml_KCN1BR06U:3"
 
