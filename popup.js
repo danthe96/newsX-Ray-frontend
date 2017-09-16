@@ -122,7 +122,7 @@ function showProgressText(text) {
   const node = document.getElementById("progressInfo");
   node.innerText = text;
 }
-
+let host = null;
 function sendToBackend(result) {
   const paragraphs = result[0];   // no idea
   if(paragraphs.length > 0){
@@ -134,13 +134,19 @@ function sendToBackend(result) {
     document.getElementById('notInArticleNotice').style.display = 'block';
   }
   const textJoined = paragraphs.join(" ").replace("\n", " ");
-  chrome.extension.getBackgroundPage().sendToBackend(textJoined);
+  console.log(chrome.extension.getBackgroundPage());
+  chrome.extension.getBackgroundPage().sendToBackend(textJoined, result => {
+    console.log('final result', result);
+    result.matched_sentences.forEach(r=>highlightText(r.news_sentence, r.score, r.reuters_sentence));
+    appendOmittedText(result.omitted_sentences, selectors[host]);
+  });
 };
 
 document.addEventListener('DOMContentLoaded', () => {
 
-  getCurrentTabUrl((url) => {    
-    const host = hostForUrl(url);
+  getCurrentTabUrl((url) => {   
+    host = hostForUrl(url);
+
     if(host in selectors) {
       document.getElementById('unsupportedNotice').style.display = 'none';
       extractText(host, sendToBackend);
