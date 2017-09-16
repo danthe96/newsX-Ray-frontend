@@ -1,7 +1,7 @@
 var BLUEMIX_NLP =
-  "https://gateway.watsonplatform.net/natural-language-understanding/api/v1/analyze?version=2017-02-27&features=concepts,categories,emotion,keywords,sentiment&text="
+  "https://gateway.watsonplatform.net/natural-language-understanding/api/v1/analyze?version=2017-02-27&features=concepts,entities,emotion,keywords,sentiment&text="
 
-var REUTERS_API = "http://rmb.reuters.com/rmd/rest/json/search?mediaType=T&language=en&token=0Uar2fCpykWL+Yi+Q9MFJlBqVn4owE8q81kIX5wuiTI=&dateRange=2017.09.16.00.00&q=body%3A"
+var REUTERS_API = "http://rmb.reuters.com/rmd/rest/json/search?mediaType=T&language=de&token=0Uar2fCpykWL+Yi+Q9MFJlBqVn4owE8q81kIX5wuiTI=&sort=score&dateRange=2017.09.15.00.00&q=body%3A"
 
 var user = "***REMOVED***";
 var pass = "***REMOVED***"
@@ -18,16 +18,20 @@ function sendToBackend(text) {
   console.log(bluemixNLP)
 
   var keywords = "";
-  console.log(bluemixNLP.keywords);
+  console.log(bluemixNLP.entities);
 
-  bluemixNLP.keywords.forEach(function(keyword) {
-    console.log(keyword.text.split(/ |-|=/))
-    keyword.text.split(/ |-|=/).forEach(function(word){
-
-      keywords += word + " OR "
-    })
+  bluemixNLP.entities.forEach(function(keyword) {
+    if (keyword.relevance >= 0.2) {
+      if (keyword.text.search(/ |-|=/)) {
+        console.log(keyword.text)
+        keywords += '"' + keyword.text + '"' + " AND "
+      } else {
+        console.log(keyword.text)
+        keywords += keyword.text + " AND "
+      }
+    }
   });
-  keywords = keywords.slice(0, -4);
+  keywords = keywords.slice(0, -5);
 
   req = new XMLHttpRequest();
   reutersApiCall = REUTERS_API + encodeURIComponent(keywords)
@@ -37,9 +41,13 @@ function sendToBackend(text) {
   var reutersInfo = JSON.parse(req.responseText);
   console.log(reutersInfo)
 
-  reutersInfo.results.result.forEach(function(result) {
-    console.log(result.headline)
-  });
+  if(reutersInfo && reutersInfo.results.numFound > 0) {
+    reutersInfo.results.result.forEach(function(result) {
+      console.log(result.headline)
+    });
+  } else {
+    console.log("Reuters did not return anything")
+  }
 }
 
 function processContextMenuClick(info) {
