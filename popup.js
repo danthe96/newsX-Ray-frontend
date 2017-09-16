@@ -77,6 +77,17 @@ function hostForUrl(urlString) {
   return url.hostname;
 }
 
+function makeSpan(text, newClass) {
+  const replacer = (text, newClass) => {
+    const addedText = `<span class="${newClass}">${text}</span>`;
+    document.body.innerHTML = document.body.innerHTML.replace(text, addedText);
+  };
+  const script = `(${replacer.toString()})("${text.replace('"', '\\"').replace('\'', '\\\'')}", "${newClass}")`;
+  chrome.tabs.executeScript({
+    code: script
+  }, null);
+}
+
 /**
  * Change the background color of the current page.
  *
@@ -146,5 +157,11 @@ document.addEventListener('DOMContentLoaded', () => {
       button.outerHTML = "This page is not supported"
     }
     
+  });
+
+  // test
+  const colorButton = document.getElementById('colorize-test');
+  colorButton.addEventListener('click', () => {
+    makeSpan('The', 'reuters');
   });
 });
