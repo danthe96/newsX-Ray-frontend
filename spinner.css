@@ -1,4 +1,5 @@
 body {
+    width: 400px;
     margin: 10px;
     white-space: nowrap;
 }
@@ -10,8 +11,8 @@ h1 {
 #container {
     align-items: center;
     display: grid;
-    justify-content: space-between;
-    min-width: 120px;
+    justify-content: normal;
+    width: 100%;
 }
 
 #progressInfo {
@@ -23,13 +24,13 @@ h1 {
 }
 
 #loadingIndicator {
-    width: 120px;
+    width: 100%;
 }
 #spinner-container {
     height: 120px;
 }
 .xray-spinner {
-    position: absolute;
+    position: relative;
 }
 .spin {
     -webkit-animation:spin 4s linear infinite;
@@ -37,6 +38,7 @@ h1 {
     animation:spin 4s linear infinite;
 }
 .spin-rev {
+    margin-left: -120px;
     -webkit-animation:antispin 4s linear infinite;
     -moz-animation:antispin 4s linear infinite;
     animation:antispin 4s linear infinite;

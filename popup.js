@@ -126,7 +126,12 @@ function showProgressText(text) {
 function sendToBackend(result) {
   const paragraphs = result[0];   // no idea
   if(paragraphs.length > 0){
+      document.getElementById('notInArticleNotice').style.display = 'none';
+      document.getElementById('defaultIcon').style.display = 'none';
       showSpinner();
+  } else {
+    document.getElementById('defaultIcon').style.display = '';
+    document.getElementById('notInArticleNotice').style.display = 'block';
   }
   const textJoined = paragraphs.join(" ").replace("\n", " ");
   chrome.extension.getBackgroundPage().sendToBackend(textJoined);
@@ -137,8 +142,10 @@ document.addEventListener('DOMContentLoaded', () => {
   getCurrentTabUrl((url) => {    
     const host = hostForUrl(url);
     if(host in selectors) {
+      document.getElementById('unsupportedNotice').style.display = 'none';
       extractText(host, sendToBackend);
     } else {
+      document.getElementById('defaultIcon').style.display = '';
       document.getElementById('unsupportedNotice').style.display = 'block';
     }
     
