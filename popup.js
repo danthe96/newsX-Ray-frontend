@@ -125,6 +125,9 @@ function showProgressText(text) {
 
 function sendToBackend(result) {
   const paragraphs = result[0];   // no idea
+  if(paragraphs.length > 0){
+      showSpinner();
+  }
   const textJoined = paragraphs.join(" ").replace("\n", " ");
   chrome.extension.getBackgroundPage().sendToBackend(textJoined);
 };
@@ -134,7 +137,6 @@ document.addEventListener('DOMContentLoaded', () => {
   getCurrentTabUrl((url) => {    
     const host = hostForUrl(url);
     if(host in selectors) {
-      showSpinner();
       extractText(host, sendToBackend);
     } else {
       document.getElementById('unsupportedNotice').style.display = 'block';
