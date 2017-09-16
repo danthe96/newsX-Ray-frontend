@@ -52,15 +52,21 @@ function getCurrentTabUrl(callback) {
  */
 function extractNYTStory() {
   var xPath = '//*[@id="story"]//p[contains(@class, "story-content")]//text()';
-  var script = `() => {let results = [];
-  let query = document.evaluate('${xPath}', document.body, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
-  for (let i=0, length=query.snapshotLength; i<length; ++i) {
-    results.push(query.snapshotItem(i));
-  }
-  return results
+  var script3 = `() => {let results = [];
+    Array.prototype.slice.call(document.querySelectorAll('#story div.story-body > p')).map(x=>x.textContent)
 }`;
+  const selector = '#story div.story-body > p';
+  const extract = () => {
+    const query = document.querySelectorAll('#story div.story-body > p')
+    const array = Array.prototype.slice.call(document.querySelectorAll('#story div.story-body > p'));
+    const paragraphs = array.map(x=>x.textContent);
+    alert(paragraphs);
+    return paragraphs;
+  };
+  const script = extract.toString();
 var script2 = `$x('${xPath}')`;
   var callback = (result) => {
+    document.appendChild(result);
     console.log(result);
   };
   chrome.tabs.executeScript({
