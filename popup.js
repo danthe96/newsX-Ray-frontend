@@ -77,8 +77,14 @@ function hostForUrl(urlString) {
 function highlightText(text, transparency, altText) {
   const replacer = (text, transparency, altText) => {
     const tooltipHtml = altText ? `data-balloon="${altText}" data-balloon-pos="up" data-balloon-length="xlarge"` : "";
-    const addedText = `<span style="background-color: rgba(255, 187, 0, ${transparency})" ${tooltipHtml}>${text}</span>`;
-    document.body.innerHTML = document.body.innerHTML.replace(text, addedText);
+    const leading = `<span style="background-color: rgba(255, 187, 0, ${transparency})" ${tooltipHtml}>`;
+    const trailing = "</span>";
+    // world-class replacement logic right here
+    const threshold = 17;
+    const leadingText = text.slice(0, threshold);
+    const trailingText = text.slice(-threshold);
+    document.body.innerHTML = document.body.innerHTML.replace(leadingText, leading+leadingText);
+    document.body.innerHTML = document.body.innerHTML.replace(trailingText, trailingText+trailing);
   };
   const script = `(${replacer.toString()})("${text.replace('"', '\\"').replace('\'', '\\\'')}", ${transparency}, "${altText}")`;
   chrome.tabs.executeScript({
@@ -136,6 +142,7 @@ function sendToBackend(result) {
     console.log('final result', result);
     result.matched_sentences.forEach(r=>highlightText(r.news_sentence, r.score, r.reuters_sentence));
     appendOmittedText(result.omitted_sentences, selectors[host]);
+    hideSpinner();
   });
 };
 
