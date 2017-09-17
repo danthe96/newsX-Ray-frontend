@@ -116,16 +116,16 @@ function appendSentimentAnalysis(newsAdditions, selectorForArticleParagraphs){
   }
 
   results = getSentimentsAndEmotion(newsAdditions.join(' '));
-  var sentimentScore = results["sentiment"]["document"]["score"]
-  var sentimentText = `The information added by the newspaper is fairly neutral.`
-  const emotions = results["emotion"]["document"]["emotion"]
+  var sentimentScore = results["sentiment"]["document"]["score"];
+  var sentimentText = `The information added by the newspaper is fairly neutral.`;
+  const emotions = results["emotion"]["document"]["emotion"];
   const maxEmotion = Object.keys(emotions).reduce(function(a, b){ return emotions[a] > emotions[b] ? a : b });
 
   chrome.storage.sync.get({"sentimentStats": {}}, (items) => {
       if(!(host in items["sentimentStats"])){
         items["sentimentStats"][host] = {
             "sentimentScoreSum": 0,
-            "emotions": {
+            "emotions":{
               "sadnessSum": 0,
               "joySum": 0,
               "fearSum": 0,
@@ -145,7 +145,7 @@ function appendSentimentAnalysis(newsAdditions, selectorForArticleParagraphs){
       statistics["emotions"]["angerSum"] += emotions["anger"]
       statistics["counter"] += 1
 
-      avg_sentiment = statistics["sentimentScoreSum"] / statistics["counter"]
+      avg_sentiment = statistics["sentimentScoreSum"] / statistics["counter"];
 
       chrome.storage.sync.set({'sentimentStats': items["sentimentStats"]}, () => {
 
@@ -190,8 +190,7 @@ function appendSentimentAnalysis(newsAdditions, selectorForArticleParagraphs){
         chrome.tabs.executeScript({code});
 
       });
-
-  })
+  });
 }
 
 function appendOmittedText(paragraphs, selectorForArticleParagraphs) {
@@ -228,7 +227,9 @@ function showProgressText(text) {
   const node = document.getElementById("progressInfo");
   node.innerText = text;
 }
+
 let host = null;
+
 function startAnalysis(result) {
   const {paragraphs, title, date} = result[0];   // no idea
   debugger;
@@ -252,53 +253,75 @@ function startAnalysis(result) {
 };
 
 function sendToBackend(text, title, date, callback) {
-
   var blueMixKeywords = getKeywords(title.replace(/ [^a-zA-Z ]|[^a-zA-Z ] /g, " "))
   console.log(blueMixKeywords)
+  searchMatchingReutersArticles(blueMixKeywords, callback, -1, date, text);
+}
 
-  const reutersInfo = searchReutersArticleByKeywordAndDate(blueMixKeywords, date)
-  console.log(reutersInfo)
-
-  if(reutersInfo && reutersInfo.results.numFound > 0) {
-    reutersInfo.results.result.forEach(function(result) {
-      console.log(result.headline);
-
-      req = new XMLHttpRequest();
-      reutersApiCall = REUTERS_ITEM_API + `&id=${REUTERS_ITEM_ID_TEMP}`
-      req.open("GET", reutersApiCall, false)
-      req.send();
-
-      const reutersArticle = JSON.parse(req.responseText);
-
-      console.log('reutersArticle', reutersArticle);
-      reuters_text = reutersArticle.body_xhtml;
-
-      chrome.tabs.query({
-        active: true,
-        currentWindow: true
-      }, function(tabs) {
-        var tab = tabs[0];
-        const url = new URL(tab.url);
-        const source = url.hostname;
-
-        req = new XMLHttpRequest();
-        var backendUrl = 'http://172.30.7.156:8000';
-        req.open("POST", backendUrl, false);
-        req.setRequestHeader("Content-type", "application/json");
-        req.send(JSON.stringify({
-          'reuters_id': REUTERS_ITEM_ID_TEMP,
-          'source': source,
-          'reuters': reuters_text,
-          'news': text
-        }));
-        const result = JSON.parse(req.responseText);
-        if(callback) callback(result); else console.log(result);
-      });
-      // query end
-    });
-  } else {
-    console.log("Reuters did not return anything")
+function searchMatchingReutersArticles(keywords, callback, leaveOut, date, text) {
+  if(leaveOut==keywords.length) {
+    console.error('No more combinations to try out');
+    return;
   }
+  const filteredKeywords = keywords.filter((value, index)=>index!=leaveOut);
+  const reutersInfo = searchReutersArticleByKeywordAndDate(filteredKeywords, date);
+
+  if(!reutersInfo) {
+    console.error('Incorrect Reuters response', req.responseText);
+    return;
+  }
+
+  console.log('reutersInfo', reutersInfo);
+
+  if(reutersInfo.results.numFound == 0) {
+      console.log("Reuters did not return anything, trying again");
+      return searchMatchingReutersArticles(keywords, callback, leaveOut + 1);
+  }
+  continueDownloadingReutersArticle(reutersInfo, callback, text);
+}
+
+function continueDownloadingReutersArticle(reutersInfo, callback, text) {
+  reutersInfo.results.result.forEach(function(result) {
+    console.log(result.headline);
+
+    req = new XMLHttpRequest();
+    reutersApiCall = REUTERS_ITEM_API + `&id=${REUTERS_ITEM_ID_TEMP}`
+    req.open("GET", reutersApiCall, false)
+    req.send();
+
+    const reutersArticle = JSON.parse(req.responseText);
+
+    console.log('reutersArticle', reutersArticle);
+    reuters_text = reutersArticle.body_xhtml;
+
+    finalRequest(text, reuters_text, reutersArticle.versionedguid, callback);
+  });
+}
+
+function finalRequest(text, reuters_text, reutersId, callback) {
+  chrome.tabs.query({
+    active: true,
+    currentWindow: true
+  }, function(tabs) {
+    var tab = tabs[0];
+    const url = new URL(tab.url);
+    const sourceId = url.hostname;
+
+    req = new XMLHttpRequest();
+    var backendUrl = 'http://172.30.7.156:8000';
+    req.open("POST", backendUrl, false);
+    req.setRequestHeader("Content-type", "application/json");
+    req.send(JSON.stringify({
+      'reuters_id': reutersId,
+      'source': sourceId,
+      'reuters': reuters_text,
+      'news': text
+    }));
+    const result = JSON.parse(req.responseText);
+    if(callback) callback(result);
+    else console.error('no callback specified', result);
+  });
+  // query end
 }
 
 document.addEventListener('DOMContentLoaded', () => {

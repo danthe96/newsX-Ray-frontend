@@ -66,6 +66,10 @@ function sendToBackend(text, callback) {
   var reutersInfo = JSON.parse(req.responseText);
   console.log(reutersInfo);
 
+  if(!reutersInfo) {
+    console.error('Incorrect Reuters response', req.responseText);
+    return;
+  }
   if(reutersInfo && reutersInfo.results.numFound > 0) {
     reutersInfo.results.result.forEach(function(result) {
       console.log(result.headline);
