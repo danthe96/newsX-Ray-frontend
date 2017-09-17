@@ -296,6 +296,7 @@ function continueDownloadingReutersArticle(reutersInfo, callback, text) {
 }
 
 function finalRequest(text, reuters_text, reutersId, callback) {
+  reportProgress('Comparing article with Reuters match');
   chrome.tabs.query({
     active: true,
     currentWindow: true
@@ -320,7 +321,7 @@ function finalRequest(text, reuters_text, reutersId, callback) {
       console.error(error);
     }
     const result = JSON.parse(req.responseText);
-    if(!result) 
+    reportProgress('done:Analysis complete!');
     if(callback) callback(result);
     else console.error('no callback specified', result);
   });
