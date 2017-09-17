@@ -74,7 +74,7 @@ function sendToBackend(text, callback) {
       console.log(result.headline);
 
       req = new XMLHttpRequest();
-      reutersApiCall = REUTERS_ITEM_API + `&id=${result.}`
+      reutersApiCall = REUTERS_ITEM_API + `&id=${result.id}`
       req.open("GET", reutersApiCall, false)
       req.send();
 
