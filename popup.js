@@ -245,7 +245,6 @@ function startAnalysis(result) {
     document.getElementById('notInArticleNotice').style.display = 'block';
   }
   const textJoined = paragraphs.join(" ").replace("\n", " ");
-  console.log(chrome.extension.getBackgroundPage());
   sendToBackend(textJoined, title, date, result => {
     console.log('final result', result);
     result.matched_sentences.forEach(r=>highlightText(r.news_sentence, r.score, `Similarity: ${100*r.score}%\\nOriginal sentence: \\"${r.reuters_sentence}\\"`));
@@ -278,8 +277,9 @@ function searchMatchingReutersArticles(keywords, callback, leaveOut, date, text)
 
   if(reutersInfo.results.numFound == 0) {
       console.log("Reuters did not return anything, trying again");
-      return searchMatchingReutersArticles(keywords, callback, leaveOut + 1);
+      return searchMatchingReutersArticles(keywords, callback, leaveOut + 1, date, text);
   }
+  
   continueDownloadingReutersArticle(reutersInfo, callback, text);
 }
 
