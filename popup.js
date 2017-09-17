@@ -67,6 +67,10 @@ const selectors = {
       body: "#wsj-article-wrap > p",
       //date: "head > meta[name^=article.published]",
       //dateParser: node => node.attributes["content"].textContent
+    },
+    "www.breitbart.com": {
+      title: "header h1",
+      body: ".entry-content p"
     }
 };
 /**
@@ -172,13 +176,13 @@ function appendSentimentAnalysis(newsAdditions, selectorForArticleParagraphs){
           sentimentText = `The information added or the views expressed by the newspaper are mostly positive.`
         }
 
-        if(sentimentScore < -0.4){
+        if(avg_sentiment < -0.4){
           sentimentText += `\n Articles by ` + host + ` have been very negative in the past, characterized by ${maxPastEmotion}.`
-        } else if(sentimentScore < -0.1){
+        } else if(avg_sentiment < -0.1){
           sentimentText += `\n Articles by ` + host + ` have been mostly negative in the past.`
-        } else if(sentimentScore > 0.4){
+        } else if(avg_sentiment > 0.4){
           sentimentText += `\n Articles by ` + host + ` have been very positive in the past, characterized by ${maxPastEmotion}.`
-        } else if (sentimentScore > 0.1){
+        } else if (avg_sentiment > 0.1){
           sentimentText += `\n Articles by ` + host + ` have been mostly positive in the past.`
         } else {
           sentimentText += `\n Articles by ` + host + ` have been very neutral in the past.`
@@ -242,7 +246,7 @@ function prepareArticleForHighlighting() {
   const injected = (sel) => {
     const mainNode = document.querySelector(sel).parentNode;
     console.error(mainNode);
-    mainNode.innerHTML = mainNode.innerHTML.replace(/(<a[^>]*>)|(<\/a>)/g, "");
+    mainNode.innerHTML = mainNode.innerHTML.replace(/(<a[^>]*>)|(<\/a>)/g, "").replace(/[“”]/g, "\"");
   };
   const code = `(${injected.toString()})("${selectors[host].body}")`;
   chrome.tabs.executeScript({code});

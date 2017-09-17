@@ -38,7 +38,7 @@ const searchReutersArticleByKeywordAndDate = (blueMixKeywords, date) => {
       }
       if (keyword.text.search(/ |-/)) {
         //console.log(keyword.text)
-        query += keyword.text.split(/ |-/).join(" AND ")
+        query += "(" + keyword.text.split(/ |-/).join(" OR ") + ")"
       } else {
         //console.log(keyword.text)
         query += keyword.text
