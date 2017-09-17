@@ -78,7 +78,7 @@ function extractText(host, callback) {
   const extractor = (selectorString) => {
     const selector = JSON.parse(selectorString);
     const nodes = Array.prototype.slice.call(document.querySelectorAll(selector.body));
-    console.log('nodes', nodes);
+    //console.log('nodes', nodes);
     const paragraphs = nodes.map(p=>p.textContent);
     const title = document.querySelector(selector.title).textContent;
     const dateNode = document.querySelector(selector.date || "time");
@@ -186,7 +186,10 @@ function appendSentimentAnalysis(newsAdditions, selectorForArticleParagraphs){
           const parent = last.parentNode;
 
           const sentimentElement = document.createElement("h2");
+          sentimentElement.className = "sentiment";
           sentimentElement.appendChild(document.createTextNode(sentimentText));
+
+          //parent.insertBefore(nodes[nodes.length - 2], sentimentElement);
           parent.appendChild(sentimentElement);
         };
 
@@ -204,7 +207,7 @@ function appendOmittedText(paragraphs, selectorForArticleParagraphs) {
   const appender = (paragraphs, selector) => {
     const nodes = document.querySelectorAll(selector);
     const last = nodes[nodes.length - 1];
-    console.log(last);
+    //console.log(last);
     const parent = last.parentNode;
 
     const h1 = document.createElement("h1");
@@ -223,7 +226,7 @@ function appendOmittedText(paragraphs, selectorForArticleParagraphs) {
   };
 
   const code = `(${appender.toString()})(${JSON.stringify(paragraphs)}, "${selectorForArticleParagraphs}")`;
-  console.log(code);
+  //console.log(code);
   chrome.tabs.executeScript({code});
 }
 
@@ -232,15 +235,15 @@ let host = null;
 function startAnalysis(result) {
   if(!(result[0] || []).paragraphs) console.error('Expected array with object', result);
   const {paragraphs, title, date} = result[0];   // no idea
-  console.log(`Starting analysis on ${paragraphs.length} paragraphs`);
+  //console.log(`Starting analysis on ${paragraphs.length} paragraphs`);
   if(paragraphs.length > 0){
       startSpinning();
       reportProgress('Analyzing...');
       const textJoined = paragraphs.join(" ").replace("\n", " ");
       sendToBackend(textJoined, title, date, result => {
-        console.log('final result', result);
+        //console.log('final result', result);
         result.matched_sentences.forEach(r => {
-            console.log('r', r);
+            //console.log('r', r);
             highlightText(r.news_sentence, r.score, `Similarity: ${100*r.score}%, Original sentence: ${escape(r.reuters_sentence)}`, true);
         });
         appendSentimentAnalysis(result.news_additions, selectors[host].body);
@@ -255,7 +258,7 @@ function startAnalysis(result) {
 
 function sendToBackend(text, title, dateStr, callback) {
   var blueMixKeywords = getKeywords(title.replace(/ [^a-zA-Z ]|[^a-zA-Z ] /g, " "))
-  console.log(blueMixKeywords)
+  //console.log(blueMixKeywords)
   const date = new Date(dateStr)
   searchMatchingReutersArticles(blueMixKeywords, callback, -1, date, text);
 }
@@ -270,7 +273,7 @@ function searchMatchingReutersArticles(keywords, callback, leaveOut, date, text)
   const articleId = searchReutersArticleByKeywordAndDate(filteredKeywords, date);
 
   if(articleId === -1) {
-      console.log("Reuters did not return anything, trying again");
+      //console.log("Reuters did not return anything, trying again");
       return searchMatchingReutersArticles(keywords, callback, leaveOut + 1, date, text);
   }
 
@@ -285,7 +288,7 @@ function continueDownloadingReutersArticle(articleId, callback, text) {
 
     const reutersArticle = JSON.parse(req.responseText);
 
-    console.log('reutersArticle', reutersArticle);
+    //console.log('reutersArticle', reutersArticle);
     reuters_text = reutersArticle.body_xhtml;
 
     finalRequest(text, reuters_text, reutersArticle.versionedguid, callback);

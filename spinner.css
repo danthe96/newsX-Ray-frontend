@@ -4,7 +4,7 @@ body {
     white-space: nowrap;
 }
 
-h1 {
+h1, h2 {
     font-size: 15px;
 }
 
@@ -21,6 +21,12 @@ h1 {
     height: 3em;
     width: 100%;
     padding-top: 1em;
+}
+
+.sentiment {
+    background-color: lighten(red, 20%);
+    padding: 1em;
+    border-radius: 1em;
 }
 
 #loadingIndicator {

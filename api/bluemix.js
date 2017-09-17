@@ -7,7 +7,7 @@ const pass = "***REMOVED***";
 function makeBluemixRequest(payload) {
   const req = new XMLHttpRequest();
 
-  console.log('Making request to', BLUEMIX_NLP);
+  //console.log('Making request to', BLUEMIX_NLP);
 
   req.open("POST", BLUEMIX_NLP, false);
   req.setRequestHeader("Content-type", "application/json");
@@ -15,7 +15,7 @@ function makeBluemixRequest(payload) {
   req.send(JSON.stringify(payload));
 
   var bluemixNLP = JSON.parse(req.responseText);
-  console.log('Got Bluemix NLP answer', bluemixNLP);
+  //console.log('Got Bluemix NLP answer', bluemixNLP);
   return bluemixNLP;
 }
 

@@ -16,7 +16,7 @@ const searchReutersArticleByKeywordAndDate = (blueMixKeywords, date) => {
   if(date) {
     orgDate = new Date(date);
     date.setDate(date.getDate() - 1)
-    console.log(orgDate)
+    //console.log(orgDate)
     const y = date.getFullYear();
     const m = leadingZero(date.getMonth() + 1);
     const d = leadingZero(date.getDate());
@@ -28,7 +28,7 @@ const searchReutersArticleByKeywordAndDate = (blueMixKeywords, date) => {
     const ho = leadingZero(orgDate.getHours());
     const mino = leadingZero(orgDate.getMinutes());
     dateRange = `${y}.${m}.${d}.${h}.${min}-${yo}.${mo}.${doo}.${ho}.${mino}`
-    console.log(dateRange)
+    //console.log(dateRange)
   }
 
   blueMixKeywords.forEach(function(keyword) {
@@ -37,10 +37,10 @@ const searchReutersArticleByKeywordAndDate = (blueMixKeywords, date) => {
         query += " AND "
       }
       if (keyword.text.search(/ |-/)) {
-        console.log(keyword.text)
+        //console.log(keyword.text)
         query += keyword.text.split(/ |-/).join(" AND ")
       } else {
-        console.log(keyword.text)
+        //console.log(keyword.text)
         query += keyword.text
       }
     }
@@ -49,16 +49,16 @@ const searchReutersArticleByKeywordAndDate = (blueMixKeywords, date) => {
     console.error('No relevant keywords', blueMixKeywords);
     return;
   }
-  console.log('Querying reuters article search', blueMixKeywords, query);
+  //console.log('Querying reuters article search', blueMixKeywords, query);
 
   let reutersApiCall = REUTERS_API + '&q=' + encodeURIComponent(query);
   if(dateRange) reutersApiCall += `&dateRange=${dateRange}`;
-  console.log(reutersApiCall)
+  //console.log(reutersApiCall)
   req.open("GET", reutersApiCall, false)
   req.send();
 
   var reutersInfo = JSON.parse(req.responseText);
-  console.log(reutersInfo)
+  //console.log(reutersInfo)
 
   if(!reutersInfo || !reutersInfo.results) {
     console.error('Incorrect Reuters response', req.responseText);
@@ -71,7 +71,7 @@ const searchReutersArticleByKeywordAndDate = (blueMixKeywords, date) => {
   }
 
   reutersInfo.results.result.forEach((article) => {
-    console.log(article.headline)
+    //console.log(article.headline)
   });
 
   // get article id with the smallest time difference to dateCreated

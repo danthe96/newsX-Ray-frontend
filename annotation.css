@@ -11,6 +11,12 @@
     margin-top: 2em;
 }
 
+.sentiment {
+    background-color: red;
+    padding: 1em;
+    border-radius: 1em;
+}
+
 /* Tooltip container */
 .tooltip {
     position: relative;
