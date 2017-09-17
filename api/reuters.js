@@ -1,14 +1,29 @@
+const REUTERS_ITEM_ID_TEMP = "tag:reuters.com,2017:newsml_KCN1BR06U:3"
+
 const REUTERS_TOKEN = "***REMOVED***"
-const REUTERS_API = `http://rmb.reuters.com/rmd/rest/json/search?mediaType=T&language=en&token=${REUTERS_TOKEN}&sort=score&dateRange=2017.09.15.00.00&q=body%3A`
+const REUTERS_API = `http://rmb.reuters.com/rmd/rest/json/search?mediaType=T&language=en&limit=30&token=${REUTERS_TOKEN}&sort=score`
 const REUTERS_ITEM_API = `http://rmb.reuters.com/rmd/rest/json/item?token=${REUTERS_TOKEN}`
+
+const leadingZero = (num) => {
+  return ("0" + num).slice(-2)
+}
 
 const searchReutersArticleByKeywordAndDate = (blueMixKeywords, date) => {
   const req = new XMLHttpRequest();
-  let query = ""
+  let query = "q=body%3A";
+  const orgDate = new Date(date);
+  date.setDate(date.getDate() - 1)
+  console.log(orgDate)
+  const y = date.getFullYear();
+  const m = leadingZero(date.getMonth() + 1);
+  const d = leadingZero(date.getDate());
+  const h = leadingZero(date.getHours());
+  const min = leadingZero(date.getMinutes());
+  let dateRange = `${y}.${m}.${d}.${h}.${min}`
 
   blueMixKeywords.forEach(function(keyword) {
     if (keyword.relevance >= 0.4) {
-      if (query !== "") {
+      if (query !== "q=body%3A") {
         query += " AND "
       }
       if (keyword.text.search(/ |-/)) {
@@ -22,16 +37,25 @@ const searchReutersArticleByKeywordAndDate = (blueMixKeywords, date) => {
   });
   if(!query) {
     console.error('No relevant keywords', blueMixKeywords);
-    reportProgress('done:No relevant keywords');
     return null;
   }
   console.log('Querying reuters article search', blueMixKeywords, query);
 
-  reutersApiCall = REUTERS_API + encodeURIComponent(query)
+  reutersApiCall = REUTERS_API + `&dateRange=${dateRange}&` + encodeURIComponent(query)
+  console.log(reutersApiCall)
   req.open("GET", reutersApiCall, false)
   req.send();
 
   var reutersInfo = JSON.parse(req.responseText);
-  console.log(reutersInfo);
+
+  // get article id with the smallest time difference to dateCreated
+  let minTimeDiff = Math.abs(orgDate.getTime(), reutersInfo.results.result[0].dateTime);
+  let minId = reutersInfo.results.result[0].id;
+  reutersInfo.results.result.forEach((article) => {
+    if (Math.abs(article.dateCreated - orgDate.getTime()) < minTimeDiff) {
+      minTimeDiff = Math.abs(article.dateCreated - orgDate.getTime());
+      minId = article.id
+    }
+  });
   return reutersInfo;
 }

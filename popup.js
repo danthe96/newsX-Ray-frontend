@@ -247,9 +247,10 @@ function startAnalysis(result) {
   });
 };
 
-function sendToBackend(text, title, date, callback) {
+function sendToBackend(text, title, dateStr, callback) {
   var blueMixKeywords = getKeywords(title.replace(/ [^a-zA-Z ]|[^a-zA-Z ] /g, " "))
   console.log(blueMixKeywords)
+  const date = new Date(dateStr)
   searchMatchingReutersArticles(blueMixKeywords, callback, -1, date, text);
 }
 
@@ -272,7 +273,7 @@ function searchMatchingReutersArticles(keywords, callback, leaveOut, date, text)
       console.log("Reuters did not return anything, trying again");
       return searchMatchingReutersArticles(keywords, callback, leaveOut + 1, date, text);
   }
-  
+
   continueDownloadingReutersArticle(reutersInfo, callback, text);
 }
 
