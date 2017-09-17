@@ -26,7 +26,7 @@ const getKeywords = (text) => {
         "keywords": {}
       }
     };
-    return makeBluemixRequest(payload);
+    return makeBluemixRequest(payload).keywords;
   };
 
 const getSentimentsAndEmotion = (text) => {

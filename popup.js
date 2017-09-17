@@ -229,7 +229,7 @@ function showProgressText(text) {
   node.innerText = text;
 }
 let host = null;
-function sendToBackend(result) {
+function startAnalysis(result) {
   const {paragraphs, title, date} = result[0];   // no idea
   debugger;
   if(paragraphs.length > 0){
@@ -242,7 +242,7 @@ function sendToBackend(result) {
   }
   const textJoined = paragraphs.join(" ").replace("\n", " ");
   console.log(chrome.extension.getBackgroundPage());
-  chrome.extension.getBackgroundPage().sendToBackend(textJoined, result => {
+  sendToBackend(textJoined, title, date, result => {
     console.log('final result', result);
     result.matched_sentences.forEach(r=>highlightText(r.news_sentence, r.score, r.reuters_sentence));
     appendOmittedText(result.omitted_sentences, selectors[host]);
@@ -251,12 +251,62 @@ function sendToBackend(result) {
   });
 };
 
+function sendToBackend(text, title, date, callback) {
+
+  var blueMixKeywords = getKeywords(title.replace(/ [^a-zA-Z ]|[^a-zA-Z ] /g, " "))
+  console.log(blueMixKeywords)
+
+  const reutersInfo = searchReutersArticleByKeywordAndDate(blueMixKeywords, date)
+  console.log(reutersInfo)
+
+  if(reutersInfo && reutersInfo.results.numFound > 0) {
+    reutersInfo.results.result.forEach(function(result) {
+      console.log(result.headline);
+
+      req = new XMLHttpRequest();
+      reutersApiCall = REUTERS_ITEM_API + `&id=${REUTERS_ITEM_ID_TEMP}`
+      req.open("GET", reutersApiCall, false)
+      req.send();
+
+      const reutersArticle = JSON.parse(req.responseText);
+
+      console.log('reutersArticle', reutersArticle);
+      reuters_text = reutersArticle.body_xhtml;
+
+      chrome.tabs.query({
+        active: true,
+        currentWindow: true
+      }, function(tabs) {
+        var tab = tabs[0];
+        const url = new URL(tab.url);
+        const source = url.hostname;
+
+        req = new XMLHttpRequest();
+        var backendUrl = 'http://172.30.7.156:8000';
+        req.open("POST", backendUrl, false);
+        req.setRequestHeader("Content-type", "application/json");
+        req.send(JSON.stringify({
+          'reuters_id': REUTERS_ITEM_ID_TEMP,
+          'source': source,
+          'reuters': reuters_text,
+          'news': text
+        }));
+        const result = JSON.parse(req.responseText);
+        if(callback) callback(result); else console.log(result);
+      });
+      // query end
+    });
+  } else {
+    console.log("Reuters did not return anything")
+  }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   getCurrentTabUrl((url) => {
     host = hostForUrl(url);
     if(host in selectors) {
       document.getElementById('unsupportedNotice').style.display = 'none';
-      extractText(host, sendToBackend);
+      extractText(host, startAnalysis);
     } else {
       document.getElementById('defaultIcon').style.display = '';
       document.getElementById('unsupportedNotice').style.display = 'block';
