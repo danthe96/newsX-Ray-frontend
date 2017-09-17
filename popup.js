@@ -97,9 +97,9 @@ function hostForUrl(urlString) {
   return url.hostname;
 }
 
-function highlightText(text, transparency, altText) {
-  const replacer = (text, transparency, altText) => {
-    const tooltipHtml = altText ? `data-balloon="${altText}" data-balloon-pos="up" data-balloon-length="xlarge"` : "";
+function highlightText(text, transparency, altText, esc = false) {
+  const replacer = (text, transparency, altText, esc) => {
+    const tooltipHtml = altText ? `data-balloon="${esc ? unescape(altText) : altText}" data-balloon-pos="up" data-balloon-length="xlarge"` : "";
     const leading = `<span style="background-color: rgba(255, 187, 0, ${transparency})" ${tooltipHtml}>`;
     const trailing = "</span>";
     // world-class replacement logic right here
@@ -112,7 +112,7 @@ function highlightText(text, transparency, altText) {
     document.body.innerHTML = document.body.innerHTML.replace(leadingText, leading+leadingText);
     document.body.innerHTML = document.body.innerHTML.replace(trailingText, trailingText+trailing);
   };
-  const script = `(${replacer.toString()})("${text.replace('"', '\\"').replace('\'', '\\\'')}", ${transparency}, "${altText}")`;
+  const script = `(${replacer.toString()})(${JSON.stringify(text)}, ${transparency}, ${JSON.stringify(altText)}, ${esc})`;
   chrome.tabs.executeScript({
     code: script
   }, null);
@@ -134,11 +134,11 @@ function appendSentimentAnalysis(newsAdditions, selectorForArticleParagraphs){
         items["sentimentStats"][host] = {
             "sentimentScoreSum": 0,
             "emotions":{
-              "sadnessSum": 0,
-              "joySum": 0,
-              "fearSum": 0,
-              "disgustSum": 0,
-              "angerSum": 0
+              "sadness": 0,
+              "joy": 0,
+              "fear": 0,
+              "disgust": 0,
+              "anger": 0
             },
             "counter": 0
         }
@@ -146,11 +146,11 @@ function appendSentimentAnalysis(newsAdditions, selectorForArticleParagraphs){
 
       statistics = items["sentimentStats"][host]
       statistics["sentimentScoreSum"] += sentimentScore
-      statistics["emotions"]["sadnessSum"] += emotions["sadness"]
-      statistics["emotions"]["joySum"] += emotions["joy"]
-      statistics["emotions"]["fearSum"] += emotions["fear"]
-      statistics["emotions"]["disgustSum"] += emotions["disgust"]
-      statistics["emotions"]["angerSum"] += emotions["anger"]
+      statistics["emotions"]["sadness"] += emotions["sadness"]
+      statistics["emotions"]["joy"] += emotions["joy"]
+      statistics["emotions"]["fear"] += emotions["fear"]
+      statistics["emotions"]["disgust"] += emotions["disgust"]
+      statistics["emotions"]["anger"] += emotions["anger"]
       statistics["counter"] += 1
 
       avg_sentiment = statistics["sentimentScoreSum"] / statistics["counter"];
@@ -190,7 +190,7 @@ function appendSentimentAnalysis(newsAdditions, selectorForArticleParagraphs){
           parent.appendChild(sentimentElement);
         };
 
-        const code = `(${appender.toString()})("${JSON.stringify(sentimentText)}", "${selectorForArticleParagraphs}")`;
+        const code = `(${appender.toString()})(${JSON.stringify(sentimentText)}, "${selectorForArticleParagraphs}")`;
         chrome.tabs.executeScript({code});
 
       });
@@ -239,7 +239,10 @@ function startAnalysis(result) {
       const textJoined = paragraphs.join(" ").replace("\n", " ");
       sendToBackend(textJoined, title, date, result => {
         console.log('final result', result);
-        result.matched_sentences.forEach(r=>highlightText(r.news_sentence, r.score, `Similarity: ${100*r.score}%\\nOriginal sentence: \\"${r.reuters_sentence}\\"`));
+        result.matched_sentences.forEach(r => {
+            console.log('r', r);
+            highlightText(r.news_sentence, r.score, `Similarity: ${100*r.score}%, Original sentence: ${escape(r.reuters_sentence)}`, true);
+        });
         appendSentimentAnalysis(result.news_additions, selectors[host].body);
         appendOmittedText(result.omitted_sentences, selectors[host].body);
         stopSpinning();
