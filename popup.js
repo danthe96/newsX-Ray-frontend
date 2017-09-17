@@ -185,8 +185,13 @@ function appendSentimentAnalysis(newsAdditions, selectorForArticleParagraphs){
           const last = nodes[nodes.length - 1];
           const parent = last.parentNode;
 
+          const h1 = document.createElement("h1");
+          h1.className = "xray-omissions-title"
+          h1.appendChild(document.createTextNode("Sentiment analysis"));
+          parent.appendChild(h1);
+
           const sentimentElement = document.createElement("blockquote");
-          sentimentElement.className = "sentiment";
+          sentimentElement.className = "xRay-sentiment";
           sentimentElement.appendChild(document.createTextNode(sentimentText));
 
           //parent.insertBefore(nodes[nodes.length - 2], sentimentElement);
