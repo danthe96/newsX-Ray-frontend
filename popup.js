@@ -106,6 +106,9 @@ function highlightText(text, transparency, altText) {
     const threshold = 17;
     const leadingText = text.slice(0, threshold);
     const trailingText = text.slice(-threshold);
+    if(document.body.innerHTML.indexOf(leadingText)==-1 || document.body.innerHTML.indexOf(trailingText)==-1) {
+      console.error('Couldn\'t match text to highlight', leadingText, trailingText);
+    }
     document.body.innerHTML = document.body.innerHTML.replace(leadingText, leading+leadingText);
     document.body.innerHTML = document.body.innerHTML.replace(trailingText, trailingText+trailing);
   };
