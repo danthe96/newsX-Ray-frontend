@@ -282,7 +282,7 @@ function continueDownloadingReutersArticle(reutersInfo, callback, text) {
     console.log(result.headline);
 
     req = new XMLHttpRequest();
-    reutersApiCall = REUTERS_ITEM_API + `&id=${REUTERS_ITEM_ID_TEMP}`
+    reutersApiCall = REUTERS_ITEM_API + `&id=${result.id}`
     req.open("GET", reutersApiCall, false)
     req.send();
 
