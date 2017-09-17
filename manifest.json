@@ -24,9 +24,5 @@
     "http://rmb.reuters.com/*"
   ],
   "background": {
-    "persistent": false,
-    "scripts": [
-      "contextMenu.js"
-    ]
   }
 }

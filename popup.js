@@ -228,7 +228,10 @@ function appendOmittedText(paragraphs, selectorForArticleParagraphs) {
 let host = null;
 
 function startAnalysis(result) {
-  if(!(result[0] || []).paragraphs) console.error('Expected array with object', result);
+  console.log('lol', result);
+  if(!((result[0] || []).paragraphs)){
+    console.error('Expected array with object', result);
+  }
   const {paragraphs, title, date} = result[0];   // no idea
   if(paragraphs.length > 0){
       startSpinning();
@@ -238,7 +241,7 @@ function startAnalysis(result) {
     document.getElementById('notInArticleNotice').style.display = 'block';
   }
   const textJoined = paragraphs.join(" ").replace("\n", " ");
-  sendToBackend(textJoined, title, date, result => {
+  runMatching(textJoined, title, date, result => {
     console.log('final result', result);
     result.matched_sentences.forEach(r=>highlightText(r.news_sentence, r.score, `Similarity: ${100*r.score}%\\nOriginal sentence: \\"${r.reuters_sentence}\\"`));
     appendOmittedText(result.omitted_sentences, selectors[host].body);
@@ -247,7 +250,7 @@ function startAnalysis(result) {
   });
 };
 
-function sendToBackend(text, title, dateStr, callback) {
+function runMatching(text, title, dateStr, callback) {
   var blueMixKeywords = getKeywords(title.replace(/ [^a-zA-Z ]|[^a-zA-Z ] /g, " "))
   console.log(blueMixKeywords)
   const date = new Date(dateStr)
