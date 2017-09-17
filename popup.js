@@ -169,28 +169,28 @@ function appendSentimentAnalysis(newsAdditions, selectorForArticleParagraphs){
         }
 
         if(sentimentScore < -0.4){
-          sentimentText += `\n Articles by #{host} have been very negative in the past, characterized by ${maxPastEmotion}.`
+          sentimentText += `\n Articles by ` + host + ` have been very negative in the past, characterized by ${maxPastEmotion}.`
         } else if(sentimentScore < -0.1){
-          sentimentText += `\n Articles by #{host} have been mostly negative in the past.`
+          sentimentText += `\n Articles by ` + host + ` have been mostly negative in the past.`
         } else if(sentimentScore > 0.4){
-          sentimentText += `\n Articles by #{host} have been very positive in the past, characterized by ${maxPastEmotion}.`
+          sentimentText += `\n Articles by ` + host + ` have been very positive in the past, characterized by ${maxPastEmotion}.`
         } else if (sentimentScore > 0.1){
-          sentimentText += `\n Articles by #{host} have been mostly positive in the past.`
+          sentimentText += `\n Articles by ` + host + ` have been mostly positive in the past.`
         } else {
-          sentimentText += `\n Articles by #{host} have been very neutral in the past.`
+          sentimentText += `\n Articles by ` + host + ` have been very neutral in the past.`
         }
 
-        const appender = (selector) => {
+        const appender = (sentimentText, selector) => {
           const nodes = document.querySelectorAll(selector);
           const last = nodes[nodes.length - 1];
           const parent = last.parentNode;
 
-          const sentimentText = document.createElement("h3");
-          sentiment.appendChild(document.createTextNode(sentimentText));
-          parent.appendChild(h1);
+          const sentimentElement = document.createElement("h2");
+          sentimentElement.appendChild(document.createTextNode(sentimentText));
+          parent.appendChild(sentimentElement);
         };
 
-        const code = `(${appender.toString()})("${selectorForArticleParagraphs}")`;
+        const code = `(${appender.toString()})("${JSON.stringify(sentimentText)}", "${selectorForArticleParagraphs}")`;
         chrome.tabs.executeScript({code});
 
       });
@@ -240,8 +240,8 @@ function startAnalysis(result) {
       sendToBackend(textJoined, title, date, result => {
         console.log('final result', result);
         result.matched_sentences.forEach(r=>highlightText(r.news_sentence, r.score, `Similarity: ${100*r.score}%\\nOriginal sentence: \\"${r.reuters_sentence}\\"`));
-        appendOmittedText(result.omitted_sentences, selectors[host].body);
         appendSentimentAnalysis(result.news_additions, selectors[host].body);
+        appendOmittedText(result.omitted_sentences, selectors[host].body);
         stopSpinning();
       });
   } else {

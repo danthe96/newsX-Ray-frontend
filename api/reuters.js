@@ -12,7 +12,7 @@ const searchReutersArticleByKeywordAndDate = (blueMixKeywords, date) => {
   const req = new XMLHttpRequest();
   let query = "q=body%3A";
   const orgDate = new Date(date);
-  date.setDate(date.getDate() - 1)
+  date.setDate(date.getDate() - 1);
   console.log(orgDate)
   const y = date.getFullYear();
   const m = leadingZero(date.getMonth() + 1);
