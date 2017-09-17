@@ -19,7 +19,12 @@ const searchReutersArticleByKeywordAndDate = (blueMixKeywords, date) => {
   const d = leadingZero(date.getDate());
   const h = leadingZero(date.getHours());
   const min = leadingZero(date.getMinutes());
-  let dateRange = `${y}.${m}.${d}.${h}.${min}`
+  const yo = orgDate.getFullYear();
+  const mo = leadingZero(orgDate.getMonth() + 1);
+  const doo = leadingZero(orgDate.getDate());
+  const ho = leadingZero(orgDate.getHours());
+  const mino = leadingZero(orgDate.getMinutes());
+  let dateRange = `${y}.${m}.${d}.${h}.${min}-${yo}.${mo}.${doo}.${ho}.${mino}`
 
   blueMixKeywords.forEach(function(keyword) {
     if (keyword.relevance >= 0.4) {
@@ -35,9 +40,9 @@ const searchReutersArticleByKeywordAndDate = (blueMixKeywords, date) => {
       }
     }
   });
-  if(!query) {
+  if(query === "q=body%3A") {
     console.error('No relevant keywords', blueMixKeywords);
-    return null;
+    return;
   }
   console.log('Querying reuters article search', blueMixKeywords, query);
 
@@ -47,9 +52,20 @@ const searchReutersArticleByKeywordAndDate = (blueMixKeywords, date) => {
   req.send();
 
   var reutersInfo = JSON.parse(req.responseText);
+  console.log(reutersInfo)
+
+  if(!reutersInfo) {
+    console.error('Incorrect Reuters response', req.responseText);
+    return;
+  }
+
+  // tries again if -1
+  if(reutersInfo.results.numFound == 0) {
+      return -1;
+  }
 
   // get article id with the smallest time difference to dateCreated
-  let minTimeDiff = Math.abs(orgDate.getTime(), reutersInfo.results.result[0].dateTime);
+  let minTimeDiff = Math.abs(orgDate.getTime() - reutersInfo.results.result[0].dateTime);
   let minId = reutersInfo.results.result[0].id;
   reutersInfo.results.result.forEach((article) => {
     if (Math.abs(article.dateCreated - orgDate.getTime()) < minTimeDiff) {
@@ -57,5 +73,5 @@ const searchReutersArticleByKeywordAndDate = (blueMixKeywords, date) => {
       minId = article.id
     }
   });
-  return reutersInfo;
+  return minId;
 }
