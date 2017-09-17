@@ -1,7 +1,7 @@
 body {
     width: 400px;
     margin: 10px;
-    white-space: nowrap;
+    /*white-space: nowrap;*/
 }
 
 h1, h2 {
@@ -37,6 +37,11 @@ h1, h2 {
 }
 .xray-spinner {
     position: relative;
+}
+.intro {
+    border-bottom: 1px solid gray;
+    padding-bottom: 1.5em;
+    margin: 1em;
 }
 .spin {
     -webkit-animation:spin 4s linear infinite;
