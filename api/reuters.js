@@ -45,7 +45,7 @@ const searchReutersArticleByKeywordAndDate = (blueMixKeywords, date) => {
       }
     }
   });
-  if(query === "q=body%3A") {
+  if(query === "body:") {
     console.error('No relevant keywords', blueMixKeywords);
     return;
   }
