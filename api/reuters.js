@@ -11,20 +11,23 @@ const leadingZero = (num) => {
 const searchReutersArticleByKeywordAndDate = (blueMixKeywords, date) => {
   const req = new XMLHttpRequest();
   let query = "q=body%3A";
-  const orgDate = new Date(date);
-  date.setDate(date.getDate() - 1);
-  console.log(orgDate)
-  const y = date.getFullYear();
-  const m = leadingZero(date.getMonth() + 1);
-  const d = leadingZero(date.getDate());
-  const h = leadingZero(date.getHours());
-  const min = leadingZero(date.getMinutes());
-  const yo = orgDate.getFullYear();
-  const mo = leadingZero(orgDate.getMonth() + 1);
-  const doo = leadingZero(orgDate.getDate());
-  const ho = leadingZero(orgDate.getHours());
-  const mino = leadingZero(orgDate.getMinutes());
-  let dateRange = `${y}.${m}.${d}.${h}.${min}-${yo}.${mo}.${doo}.${ho}.${mino}`
+  let dateRange = null;
+  if(date) {
+    const orgDate = new Date(date);
+    date.setDate(date.getDate() - 1)
+    console.log(orgDate)
+    const y = date.getFullYear();
+    const m = leadingZero(date.getMonth() + 1);
+    const d = leadingZero(date.getDate());
+    const h = leadingZero(date.getHours());
+    const min = leadingZero(date.getMinutes());
+    const yo = orgDate.getFullYear();
+    const mo = leadingZero(orgDate.getMonth() + 1);
+    const doo = leadingZero(orgDate.getDate());
+    const ho = leadingZero(orgDate.getHours());
+    const mino = leadingZero(orgDate.getMinutes());
+    dateRange = `${y}.${m}.${d}.${h}.${min}-${yo}.${mo}.${doo}.${ho}.${mino}`
+  }
 
   blueMixKeywords.forEach(function(keyword) {
     if (keyword.relevance >= 0.4) {
@@ -46,7 +49,8 @@ const searchReutersArticleByKeywordAndDate = (blueMixKeywords, date) => {
   }
   console.log('Querying reuters article search', blueMixKeywords, query);
 
-  reutersApiCall = REUTERS_API + `&dateRange=${dateRange}&` + encodeURIComponent(query)
+  let reutersApiCall = REUTERS_API + '&' + encodeURIComponent(query);
+  if(dateRange) reutersApiCall += `&dateRange=${dateRange}`;
   console.log(reutersApiCall)
   req.open("GET", reutersApiCall, false)
   req.send();
@@ -54,7 +58,7 @@ const searchReutersArticleByKeywordAndDate = (blueMixKeywords, date) => {
   var reutersInfo = JSON.parse(req.responseText);
   console.log(reutersInfo)
 
-  if(!reutersInfo) {
+  if(!reutersInfo || !reutersInfo.results) {
     console.error('Incorrect Reuters response', req.responseText);
     return;
   }
