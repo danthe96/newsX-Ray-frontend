@@ -11,8 +11,8 @@
     margin-top: 2em;
 }
 
-.sentiment {
-    background-color: red;
+.xRay-sentiment {
+    background-color: #A32780;
     padding: 1em;
     border-radius: 1em;
 }
