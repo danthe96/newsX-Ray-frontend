@@ -103,7 +103,7 @@ function highlightText(text, transparency, altText) {
     const leading = `<span style="background-color: rgba(255, 187, 0, ${transparency})" ${tooltipHtml}>`;
     const trailing = "</span>";
     // world-class replacement logic right here
-    const threshold = 17;
+    const threshold = 7;
     const leadingText = text.slice(0, threshold);
     const trailingText = text.slice(-threshold);
     if(document.body.innerHTML.indexOf(leadingText)==-1 || document.body.innerHTML.indexOf(trailingText)==-1) {
@@ -191,7 +191,6 @@ function appendSentimentAnalysis(newsAdditions, selectorForArticleParagraphs){
         };
 
         const code = `(${appender.toString()})("${selectorForArticleParagraphs}")`;
-        console.log(code);
         chrome.tabs.executeScript({code});
 
       });
@@ -233,21 +232,22 @@ let host = null;
 function startAnalysis(result) {
   if(!(result[0] || []).paragraphs) console.error('Expected array with object', result);
   const {paragraphs, title, date} = result[0];   // no idea
+  console.log(`Starting analysis on ${paragraphs.length} paragraphs`);
   if(paragraphs.length > 0){
       startSpinning();
       reportProgress('Analyzing...');
+      const textJoined = paragraphs.join(" ").replace("\n", " ");
+      sendToBackend(textJoined, title, date, result => {
+        console.log('final result', result);
+        result.matched_sentences.forEach(r=>highlightText(r.news_sentence, r.score, `Similarity: ${100*r.score}%\\nOriginal sentence: \\"${r.reuters_sentence}\\"`));
+        appendOmittedText(result.omitted_sentences, selectors[host].body);
+        appendSentimentAnalysis(result.news_additions, selectors[host].body);
+        stopSpinning();
+      });
   } else {
     document.getElementById('defaultIcon').style.display = '';
     document.getElementById('notInArticleNotice').style.display = 'block';
   }
-  const textJoined = paragraphs.join(" ").replace("\n", " ");
-  sendToBackend(textJoined, title, date, result => {
-    console.log('final result', result);
-    result.matched_sentences.forEach(r=>highlightText(r.news_sentence, r.score, `Similarity: ${100*r.score}%\\nOriginal sentence: \\"${r.reuters_sentence}\\"`));
-    appendOmittedText(result.omitted_sentences, selectors[host].body);
-    appendSentimentAnalysis(result.news_additions, selectors[host].body);
-    stopSpinning();
-  });
 };
 
 function sendToBackend(text, title, dateStr, callback) {
@@ -260,6 +260,7 @@ function sendToBackend(text, title, dateStr, callback) {
 function searchMatchingReutersArticles(keywords, callback, leaveOut, date, text) {
   if(leaveOut==keywords.length) {
     console.error('No more combinations to try out');
+    reportProgress('done:No matching article found');
     return;
   }
   const filteredKeywords = keywords.filter((value, index)=>index!=leaveOut);
@@ -301,15 +302,15 @@ function finalRequest(text, reuters_text, reutersId, callback) {
     var backendUrl = 'http://172.30.7.156:8000';
     req.open("POST", backendUrl, false);
     req.setRequestHeader("Content-type", "application/json");
-    req.send(JSON.stringify({
-      'reuters_id': reutersId,
-      'source': sourceId,
-      'reuters': reuters_text,
-      'news': text
-    }));
     try {
+      req.send(JSON.stringify({
+        'reuters_id': reutersId,
+        'source': sourceId,
+        'reuters': reuters_text,
+        'news': text
+      }));
     } catch (error) {
-     reportProgress('done:An error occurred');
+      reportProgress('done:An error occurred');
       console.error(error);
     }
     const result = JSON.parse(req.responseText);
