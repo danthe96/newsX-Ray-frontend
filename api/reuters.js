@@ -24,6 +24,7 @@ const searchReutersArticleByKeywordAndDate = (blueMixKeywords, date) => {
   });
   if(!query) {
     console.error('No relevant keywords', blueMixKeywords);
+    reportProgress('done:No relevant keywords');
     return null;
   }
   console.log('Querying reuters article search', blueMixKeywords, query);

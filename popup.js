@@ -226,21 +226,14 @@ function appendOmittedText(paragraphs, selectorForArticleParagraphs) {
   chrome.tabs.executeScript({code});
 }
 
-function showProgressText(text) {
-  const node = document.getElementById("progressInfo");
-  node.innerText = text;
-}
-
 let host = null;
 
 function startAnalysis(result) {
   if(!(result[0] || []).paragraphs) console.error('Expected array with object', result);
   const {paragraphs, title, date} = result[0];   // no idea
-  debugger;
   if(paragraphs.length > 0){
-      document.getElementById('notInArticleNotice').style.display = 'none';
-      document.getElementById('defaultIcon').style.display = 'none';
-      showSpinner();
+      startSpinning();
+      reportProgress('Analyzing...');
   } else {
     document.getElementById('defaultIcon').style.display = '';
     document.getElementById('notInArticleNotice').style.display = 'block';
@@ -251,7 +244,7 @@ function startAnalysis(result) {
     result.matched_sentences.forEach(r=>highlightText(r.news_sentence, r.score, `Similarity: ${100*r.score}%\\nOriginal sentence: \\"${r.reuters_sentence}\\"`));
     appendOmittedText(result.omitted_sentences, selectors[host]);
     appendSentimentAnalysis(result.news_additions, selectors[host]);
-    hideSpinner();
+    stopSpinning();
   });
 };
 
@@ -321,7 +314,13 @@ function finalRequest(text, reuters_text, reutersId, callback) {
       'reuters': reuters_text,
       'news': text
     }));
+    try {
+    } catch (error) {
+     reportProgress('done:An error occurred');
+      console.error(error);
+    }
     const result = JSON.parse(req.responseText);
+    if(!result) 
     if(callback) callback(result);
     else console.error('no callback specified', result);
   });
