@@ -1,4 +1,4 @@
-#News X-Ray
+# News X-Ray
 
 This is the frontend for News X-Ray, a Chrome extension identifying agency reports that were used for news articles. That way, you know which information is well-founded and what might be controversial. Through analysis we can show biases differ between news sources.
 
