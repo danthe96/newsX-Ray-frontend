@@ -54,7 +54,7 @@ const selectors = {
     },
     "abcnews.go.com": {
         title: "#article-feed > article > div > header > h1",
-        body: "#article-feed > article:nth-child(1) > div > div.article-body > div > p",
+        body: "#article-feed > article:nth-child(2) > div > div.article-body > div > p",
         date: 'head > meta[name^="Last-Modified"]',
         dateParser: node => node.attributes["content"].textContent
     },
@@ -62,6 +62,12 @@ const selectors = {
         title: "#article > div.hide-on-mobile > header > div.content__header.tonal__header > div > div > h1",
         body: "#article > div > div > div > div.js-article__body > p",
         date: "time"
+    },
+    "www.wsj.com": {
+      title: "#bigTopBox > div > div > h1",
+      body: "#wsj-article-wrap > p",
+      date: 'head > meta[name^="article.published"]',
+      dateParser: node => node.attributes["content"].textContent
     }
 };
 /**
@@ -77,7 +83,7 @@ function extractText(host, callback) {
     const paragraphs = nodes.map(p=>p.textContent);
     const title = document.querySelector(selector.title).textContent;
     const dateNode = document.querySelector(selector.date || "time");
-    const date = selector.dateParser ? selector.dateParser(dateNode) : dateNode.attributes["datetime"].textContent;
+    const date = selector.dateParser ? selector.dateParser(dateNode) : (dateNode.attributes["datetime"] || {}).textContent;
     return {paragraphs, title, date};
   };
 
@@ -229,6 +235,7 @@ function showProgressText(text) {
 let host = null;
 
 function startAnalysis(result) {
+  if(!(result[0] || []).paragraphs) console.error('Expected array with object', result);
   const {paragraphs, title, date} = result[0];   // no idea
   debugger;
   if(paragraphs.length > 0){
