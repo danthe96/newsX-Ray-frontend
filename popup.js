@@ -346,10 +346,4 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
   });
-
-  // test
-  const colorButton = document.getElementById('colorize-test');
-  colorButton.addEventListener('click', () => {
-    highlightText('headquarters', 0.9, 'Think differentThink differentThink differentThink differentThink different');
-  });
 });
