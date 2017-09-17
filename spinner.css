@@ -26,6 +26,7 @@ h1 {
 .sentiment {
     background-color: lighten(red, 20%);
     padding: 1em;
+    font-size: 15px;
     border-radius: 1em;
 }
 

@@ -10,7 +10,7 @@ const leadingZero = (num) => {
 
 const searchReutersArticleByKeywordAndDate = (blueMixKeywords, date) => {
   const req = new XMLHttpRequest();
-  let query = "body:";
+  let query = "-headline:schedule||body:";
   let dateRange = null;
   let orgDate = null;
   if(date) {
@@ -33,7 +33,7 @@ const searchReutersArticleByKeywordAndDate = (blueMixKeywords, date) => {
 
   blueMixKeywords.forEach(function(keyword) {
     if (keyword.relevance >= 0.4) {
-      if (query !== "body:") {
+      if (query !== "-headline:schedule||body:") {
         query += " AND "
       }
       if (keyword.text.search(/ |-/)) {
@@ -45,7 +45,7 @@ const searchReutersArticleByKeywordAndDate = (blueMixKeywords, date) => {
       }
     }
   });
-  if(query === "body:") {
+  if(query === "-headline:schedule||body:") {
     console.error('No relevant keywords', blueMixKeywords);
     return;
   }
@@ -77,11 +77,11 @@ const searchReutersArticleByKeywordAndDate = (blueMixKeywords, date) => {
   // get article id with the smallest time difference to dateCreated
   let minTimeDiff = Math.abs(orgDate.getTime() - reutersInfo.results.result[0].dateTime);
   let minId = reutersInfo.results.result[0].id;
-  reutersInfo.results.result.forEach((article) => {
+  /*reutersInfo.results.result.forEach((article) => {
     if (Math.abs(article.dateCreated - orgDate.getTime()) < minTimeDiff) {
       minTimeDiff = Math.abs(article.dateCreated - orgDate.getTime());
       minId = article.id
     }
-  });
+  });*/
   return minId;
 }
