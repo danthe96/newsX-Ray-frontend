@@ -230,8 +230,13 @@ function appendOmittedText(paragraphs, selectorForArticleParagraphs) {
 }
 
 function prepareArticleForHighlighting() {
-  const mainNode = document.querySelector(selectors[host].body).parent;
-  mainNode.innerHTML = mainNode.innerHTML.replace(/(<a[^>]*>)|(<\/a>)/g, "");
+  const injected = (sel) => {
+    const mainNode = document.querySelector(sel).parentNode;
+    console.error(mainNode);
+    mainNode.innerHTML = mainNode.innerHTML.replace(/(<a[^>]*>)|(<\/a>)/g, "");
+  };
+  const code = `(${injected.toString()})("${selectors[host].body}")`;
+  chrome.tabs.executeScript({code});
 }
 
 let host = null;
