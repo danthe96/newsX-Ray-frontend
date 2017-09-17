@@ -223,8 +223,12 @@ function appendOmittedText(paragraphs, selectorForArticleParagraphs) {
   };
 
   const code = `(${appender.toString()})(${JSON.stringify(paragraphs)}, "${selectorForArticleParagraphs}")`;
-  console.log(code);
   chrome.tabs.executeScript({code});
+}
+
+function prepareArticleForHighlighting() {
+  const mainNode = document.querySelector(selectors[host].body).parent;
+  mainNode.innerHTML = mainNode.innerHTML.replace(/(<a[^>]*>)|(<\/a>)/g, "");
 }
 
 let host = null;
@@ -232,6 +236,8 @@ let host = null;
 function startAnalysis(result) {
   if(!(result[0] || []).paragraphs) console.error('Expected array with object', result);
   const {paragraphs, title, date} = result[0];   // no idea
+  console.assert(date);
+  console.assert(title);
   console.log(`Starting analysis on ${paragraphs.length} paragraphs`);
   if(paragraphs.length > 0){
       startSpinning();
@@ -239,6 +245,7 @@ function startAnalysis(result) {
       const textJoined = paragraphs.join(" ").replace("\n", " ");
       sendToBackend(textJoined, title, date, result => {
         console.log('final result', result);
+        prepareArticleForHighlighting();
         result.matched_sentences.forEach(r => {
             console.log('r', r);
             highlightText(r.news_sentence, r.score, `Similarity: ${100*r.score}%, Original sentence: ${escape(r.reuters_sentence)}`, true);
@@ -303,15 +310,17 @@ function finalRequest(text, reuters_text, reutersId, callback) {
 
     req = new XMLHttpRequest();
     var backendUrl = 'http://172.30.7.156:8000';
+    const params = {
+      'reuters_id': reutersId,
+      'source': sourceId,
+      'reuters': reuters_text,
+      'news': text
+    };
     req.open("POST", backendUrl, false);
     req.setRequestHeader("Content-type", "application/json");
+    console.log('sending final request', params);
     try {
-      req.send(JSON.stringify({
-        'reuters_id': reutersId,
-        'source': sourceId,
-        'reuters': reuters_text,
-        'news': text
-      }));
+      req.send(JSON.stringify(params));
     } catch (error) {
       reportProgress('done:An error occurred');
       console.error(error);
