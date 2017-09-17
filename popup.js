@@ -103,6 +103,7 @@ function highlightText(text, transparency, altText, esc = false) {
     const leading = `<span style="background-color: rgba(255, 187, 0, ${transparency})" ${tooltipHtml}>`;
     const trailing = "</span>";
     // world-class replacement logic right here
+    /*
     const threshold = 7;
     const leadingText = text.slice(0, threshold);
     const trailingText = text.slice(-threshold);
@@ -111,6 +112,9 @@ function highlightText(text, transparency, altText, esc = false) {
     }
     document.body.innerHTML = document.body.innerHTML.replace(leadingText, leading+leadingText);
     document.body.innerHTML = document.body.innerHTML.replace(trailingText, trailingText+trailing);
+    */
+    const addedText = `<span style="background-color: rgba(255, 187, 0, ${transparency})" ${tooltipHtml}>${text}</span>`; 
+    document.body.innerHTML = document.body.innerHTML.replace(text, addedText); 
   };
   const script = `(${replacer.toString()})(${JSON.stringify(text)}, ${transparency}, ${JSON.stringify(altText)}, ${esc})`;
   chrome.tabs.executeScript({
