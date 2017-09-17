@@ -46,11 +46,11 @@ function getCurrentTabUrl(callback) {
 const selectors = {
     "www.nytimes.com": {
         title: "#headline",
-        body: "#story div.story-body > p"
+        body: "#story div.story-body > p",
     },
     "www.foxnews.com": {
         title: "#doc > div.page-content > main > section > article > header > h1",
-        body: "#doc > div.page-content > main > section > article > div > div.article-body > p"
+        body: "#doc > div.page-content > main > section > article > div > div.article-body > p",
     },
     "abcnews.go.com": {
         title: "#article-feed > article > div > header > h1",
@@ -165,7 +165,6 @@ function appendSentimentAnalysis(newsAdditions, selectorForArticleParagraphs){
           sentimentText = `The information added or the views expressed by the newspaper are mostly positive.`
         }
 
-        max_avg_emotions
         if(sentimentScore < -0.4){
           sentimentText += `\n Articles by #{host} have been very negative in the past, characterized by ${maxPastEmotion}.`
         } else if(sentimentScore < -0.1){
@@ -250,8 +249,8 @@ function startAnalysis(result) {
   sendToBackend(textJoined, title, date, result => {
     console.log('final result', result);
     result.matched_sentences.forEach(r=>highlightText(r.news_sentence, r.score, `Similarity: ${100*r.score}%\\nOriginal sentence: \\"${r.reuters_sentence}\\"`));
-    appendOmittedText(result.omitted_sentences, selectors[host]);
-    appendSentimentAnalysis(result.news_additions, selectors[host]);
+    appendOmittedText(result.omitted_sentences, selectors[host].body);
+    appendSentimentAnalysis(result.news_additions, selectors[host].body);
     hideSpinner();
   });
 };
