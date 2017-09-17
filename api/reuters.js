@@ -1,6 +1,6 @@
 const REUTERS_ITEM_ID_TEMP = "tag:reuters.com,2017:newsml_KCN1BR06U:3"
 
-const REUTERS_TOKEN = "8axRu+WqZAC8yj7X9Un9Uylur7X2G8Kk81kIX5wuiTI=="
+const REUTERS_TOKEN = "***REMOVED***"
 const REUTERS_API = `http://rmb.reuters.com/rmd/rest/json/search?mediaType=T&language=en&sort=score&token=${REUTERS_TOKEN}`
 const REUTERS_ITEM_API = `http://rmb.reuters.com/rmd/rest/json/item?token=${REUTERS_TOKEN}`
 
@@ -15,7 +15,7 @@ const searchReutersArticleByKeywordAndDate = (blueMixKeywords, date) => {
   let orgDate = null;
   if(date) {
     orgDate = new Date(date);
-    date.setDate(date.getDate() - 1)
+    date.setDate(date.getDate() - 5)
     //console.log(orgDate)
     const y = date.getFullYear();
     const m = leadingZero(date.getMonth() + 1);
@@ -49,9 +49,9 @@ const searchReutersArticleByKeywordAndDate = (blueMixKeywords, date) => {
     console.error('No relevant keywords', blueMixKeywords);
     return;
   }
-  //console.log('Querying reuters article search', blueMixKeywords, query);
+  console.log('Querying reuters article search', blueMixKeywords, query);
 
-  let reutersApiCall = REUTERS_API + '&q=' + encodeURIComponent(query);
+  let reutersApiCall = REUTERS_API + '&q=' + encodeURIComponent(query.replace(/[\u2018\u2019]/g, '').replace(/\[]-+\/()~^!|:,&'"{}\\/g, escape));
   if(dateRange) reutersApiCall += `&dateRange=${dateRange}`;
   //console.log(reutersApiCall)
   req.open("GET", reutersApiCall, false)

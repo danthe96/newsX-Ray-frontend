@@ -185,7 +185,7 @@ function appendSentimentAnalysis(newsAdditions, selectorForArticleParagraphs){
           const last = nodes[nodes.length - 1];
           const parent = last.parentNode;
 
-          const sentimentElement = document.createElement("h2");
+          const sentimentElement = document.createElement("blockquote");
           sentimentElement.className = "sentiment";
           sentimentElement.appendChild(document.createTextNode(sentimentText));
 
