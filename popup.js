@@ -250,7 +250,7 @@ function startAnalysis(result) {
   console.log(chrome.extension.getBackgroundPage());
   sendToBackend(textJoined, title, date, result => {
     console.log('final result', result);
-    result.matched_sentences.forEach(r=>highlightText(r.news_sentence, r.score, `Similarity: ${100*r.score}%\nOriginal sentence: \"${r.reuters_sentence}\"`));
+    result.matched_sentences.forEach(r=>highlightText(r.news_sentence, r.score, `Similarity: ${100*r.score}%\\nOriginal sentence: \\"${r.reuters_sentence}\\"`));
     appendOmittedText(result.omitted_sentences, selectors[host]);
     appendSentimentAnalysis(result.news_additions, selectors[host]);
     hideSpinner();
