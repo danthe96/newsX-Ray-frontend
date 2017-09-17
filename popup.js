@@ -178,10 +178,8 @@ function appendSentimentAnalysis(newsAdditions, selectorForArticleParagraphs){
           const last = nodes[nodes.length - 1];
           const parent = last.parentNode;
 
-          `The information added by the newspaper is ${sentiment}`
-
           const sentimentText = document.createElement("h3");
-          sentiment.appendChild(document.createTextNode(sentimentResult));
+          sentiment.appendChild(document.createTextNode(sentimentText));
           parent.appendChild(h1);
         };
 
@@ -245,7 +243,7 @@ function startAnalysis(result) {
   console.log(chrome.extension.getBackgroundPage());
   sendToBackend(textJoined, title, date, result => {
     console.log('final result', result);
-    result.matched_sentences.forEach(r=>highlightText(r.news_sentence, r.score, r.reuters_sentence));
+    result.matched_sentences.forEach(r=>highlightText(r.news_sentence, r.score, `Similarity: ${100*r.score}%\nOriginal sentence: \"${r.reuters_sentence}\"`));
     appendOmittedText(result.omitted_sentences, selectors[host]);
     appendSentimentAnalysis(result.news_additions, selectors[host]);
     hideSpinner();
