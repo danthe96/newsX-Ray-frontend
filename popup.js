@@ -262,13 +262,6 @@ function searchMatchingReutersArticles(keywords, callback, leaveOut, date, text)
   const filteredKeywords = keywords.filter((value, index)=>index!=leaveOut);
   const reutersInfo = searchReutersArticleByKeywordAndDate(filteredKeywords, date);
 
-  if(!reutersInfo) {
-    console.error('Incorrect Reuters response', req.responseText);
-    return;
-  }
-
-  console.log('reutersInfo', reutersInfo);
-
   if(reutersInfo.results.numFound == 0) {
       console.log("Reuters did not return anything, trying again");
       return searchMatchingReutersArticles(keywords, callback, leaveOut + 1, date, text);
