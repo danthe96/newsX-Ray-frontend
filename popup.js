@@ -260,22 +260,19 @@ function searchMatchingReutersArticles(keywords, callback, leaveOut, date, text)
     return;
   }
   const filteredKeywords = keywords.filter((value, index)=>index!=leaveOut);
-  const reutersInfo = searchReutersArticleByKeywordAndDate(filteredKeywords, date);
+  const articleId = searchReutersArticleByKeywordAndDate(filteredKeywords, date);
 
-  if(reutersInfo.results.numFound == 0) {
+  if(articleId === -1) {
       console.log("Reuters did not return anything, trying again");
       return searchMatchingReutersArticles(keywords, callback, leaveOut + 1, date, text);
   }
 
-  continueDownloadingReutersArticle(reutersInfo, callback, text);
+  continueDownloadingReutersArticle(articleId, callback, text);
 }
 
-function continueDownloadingReutersArticle(reutersInfo, callback, text) {
-  reutersInfo.results.result.forEach(function(result) {
-    console.log(result.headline);
-
+function continueDownloadingReutersArticle(articleId, callback, text) {
     req = new XMLHttpRequest();
-    reutersApiCall = REUTERS_ITEM_API + `&id=${result.id}`
+    reutersApiCall = REUTERS_ITEM_API + `&id=${articleId}`
     req.open("GET", reutersApiCall, false)
     req.send();
 
@@ -285,7 +282,6 @@ function continueDownloadingReutersArticle(reutersInfo, callback, text) {
     reuters_text = reutersArticle.body_xhtml;
 
     finalRequest(text, reuters_text, reutersArticle.versionedguid, callback);
-  });
 }
 
 function finalRequest(text, reuters_text, reutersId, callback) {

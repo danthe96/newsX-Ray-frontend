@@ -59,9 +59,9 @@ const searchReutersArticleByKeywordAndDate = (blueMixKeywords, date) => {
     return;
   }
 
+  // tries again if -1
   if(reutersInfo.results.numFound == 0) {
-      console.log("Reuters did not return anything, trying again");
-      return 0;
+      return -1;
   }
 
   // get article id with the smallest time difference to dateCreated
@@ -73,5 +73,5 @@ const searchReutersArticleByKeywordAndDate = (blueMixKeywords, date) => {
       minId = article.id
     }
   });
-  //return reutersInfo;
+  return minId;
 }
