@@ -121,18 +121,22 @@ function appendSentimentAnalysis(newsAdditions, selectorForArticleParagraphs){
   const emotions = results["emotion"]["document"]["emotion"]
   const maxEmotion = Object.keys(emotions).reduce(function(a, b){ return emotions[a] > emotions[b] ? a : b });
 
-  chrome.storage.sync.get({"sentimentStats": {
-    "sentimentScoreSum": 0,
-    "emotions": {
-      "sadnessSum": 0,
-      "joySum": 0,
-      "fearSum": 0,
-      "disgustSum": 0,
-      "angerSum": 0
-    },
-    "counter": 0
-  }}, (items) => {
-      statistics = items["sentimentStats"]
+  chrome.storage.sync.get({"sentimentStats": {}}, (items) => {
+      if(!(host in items["sentimentStats"])){
+        items["sentimentStats"][host] = {
+            "sentimentScoreSum": 0,
+            "emotions": {
+              "sadnessSum": 0,
+              "joySum": 0,
+              "fearSum": 0,
+              "disgustSum": 0,
+              "angerSum": 0
+            },
+            "counter": 0
+        }
+      }
+
+      statistics = items["sentimentStats"][host]
       statistics["sentimentScoreSum"] += sentimentScore
       statistics["emotions"]["sadnessSum"] += emotions["sadness"]
       statistics["emotions"]["joySum"] += emotions["joy"]
@@ -143,7 +147,7 @@ function appendSentimentAnalysis(newsAdditions, selectorForArticleParagraphs){
 
       avg_sentiment = statistics["sentimentScoreSum"] / statistics["counter"]
 
-      chrome.storage.sync.set({'sentimentStats': statistics}, () => {
+      chrome.storage.sync.set({'sentimentStats': items["sentimentStats"]}, () => {
 
         const maxPastEmotion = Object.keys(statistics["emotions"]).reduce(function(a, b){ return statistics["emotions"][a] > statistics["emotions"][b] ? a : b });
         if(sentimentScore < -0.4){
