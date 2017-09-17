@@ -15,7 +15,7 @@ function makeBluemixRequest(payload) {
   req.send(JSON.stringify(payload));
 
   var bluemixNLP = JSON.parse(req.responseText);
-  console.log(bluemixNLP)
+  console.log('Got Bluemix NLP answer', bluemixNLP);
   return bluemixNLP;
 }
 
