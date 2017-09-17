@@ -191,8 +191,7 @@ function appendSentimentAnalysis(newsAdditions, selectorForArticleParagraphs){
         const appender = (sentimentText, selector) => {
           const nodes = document.querySelectorAll(selector);
           const last = nodes[nodes.length - 1];
-          const parent = _parentNode || last.parentNode;
-          _parentNode = parent;
+          const parent = last.parentNode;
 
           const h1 = document.createElement("h1");
           h1.className = "xray-omissions-title"
@@ -214,7 +213,6 @@ function appendSentimentAnalysis(newsAdditions, selectorForArticleParagraphs){
   });
 }
 
-var _parentNode = null;
 function appendOmittedText(paragraphs, selectorForArticleParagraphs) {
   if(paragraphs.length == 0) {
     return;
@@ -223,8 +221,7 @@ function appendOmittedText(paragraphs, selectorForArticleParagraphs) {
     const nodes = document.querySelectorAll(selector);
     const last = nodes[nodes.length - 1];
     //console.log(last);
-    const parent = _parentNode || last.parentNode;
-    _parentNode = parent;
+    const parent = last.parentNode;
 
     const h1 = document.createElement("h1");
     h1.className = "xray-omissions-title"
