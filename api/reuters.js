@@ -22,10 +22,13 @@ const searchReutersArticleByKeywordAndDate = (blueMixKeywords, date) => {
       }
     }
   });
-  console.log(query)
+  if(!query) {
+    console.error('No relevant keywords', blueMixKeywords);
+    return null;
+  }
+  console.log('Querying reuters article search', blueMixKeywords, query);
 
   reutersApiCall = REUTERS_API + encodeURIComponent(query)
-  console.log(reutersApiCall)
   req.open("GET", reutersApiCall, false)
   req.send();
 
