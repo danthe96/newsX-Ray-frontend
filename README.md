@@ -1,5 +1,7 @@
 # News X-Ray
 
+![The tool in action](documentation/1.png)
+
 This is the frontend for News X-Ray, a Chrome extension identifying agency reports that were used for news articles. That way, you know which information is well-founded and what might be controversial. Through analysis we can show biases differ between news sources.
 News X-Ray was created by [Daniel Thevessen](https://github.com/danthe96), [Carl Goedecken](https://github.com/MasterCarl) and [Nils Strelow](https://github.com/nstrelow) at [HackZurich 2017](hackzurich.com) within just under two days. 
 
@@ -10,6 +12,10 @@ We all read news articles in some shape or form almost everyday. But in times of
 ## What it does
 
 We have developed a browser extension that looks at the article you are currently reading, and identifies a related report from a news agency such as Reuters where the basic information and facts come from. A backend finds the parts of the article that were derived from this report - even if the author has rewritten them completely - through Natural Language Processing. The extension highlights the similarities and saves sentiment trends to show how news sources differ. 
+
+![Results of the analysis](documentation/2.png)
+
+![Omissions and sentiment analysis](documentation/3.png)
 
 ## How we built it
 
