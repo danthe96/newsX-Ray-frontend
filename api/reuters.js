@@ -13,7 +13,7 @@ const searchReutersArticleByKeywordAndDate = (blueMixKeywords, date) => {
   let query = "-headline:schedule||body:";
   let dateRange = null;
   let orgDate = null;
-  if(date) {
+  if(date && date.toString() != "Invalid Date") {
     orgDate = new Date(date);
     date.setDate(date.getDate() - 5)
     //console.log(orgDate)
@@ -62,7 +62,7 @@ const searchReutersArticleByKeywordAndDate = (blueMixKeywords, date) => {
 
   if(!reutersInfo || !reutersInfo.results) {
     console.error('Incorrect Reuters response', req.responseText);
-    return;
+    return -1;
   }
 
   // tries again if -1
@@ -74,6 +74,8 @@ const searchReutersArticleByKeywordAndDate = (blueMixKeywords, date) => {
     //console.log(article.headline)
   });
 
+  if(!orgDate) return reutersInfo.results.result[0].id;
+  
   // get article id with the smallest time difference to dateCreated
   let minTimeDiff = Math.abs(orgDate.getTime() - reutersInfo.results.result[0].dateTime);
   let minId = reutersInfo.results.result[0].id;

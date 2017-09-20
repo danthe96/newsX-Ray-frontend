@@ -71,6 +71,10 @@ const selectors = {
     "www.breitbart.com": {
       title: "header h1",
       body: ".entry-content p"
+    },
+    "www.reuters.com": {
+      title: ".inner-container div h1",
+      body: ".inner-container div p"
     }
 };
 /**
@@ -86,7 +90,7 @@ function extractText(host, callback) {
     const paragraphs = nodes.map(p=>p.textContent);
     const title = document.querySelector(selector.title).textContent;
     const dateNode = document.querySelector(selector.date || "time");
-    const date = selector.dateParser ? selector.dateParser(dateNode) : (dateNode.attributes["datetime"] || {}).textContent;
+    const date = selector.dateParser ? selector.dateParser(dateNode) : (((dateNode || {}).attributes || {}).datetime || {}).textContent;
     return {paragraphs, title, date};
   };
 
