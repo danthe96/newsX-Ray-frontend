@@ -328,7 +328,7 @@ function finalRequest(text, reuters_text, reutersId, callback) {
     const sourceId = url.hostname;
 
     req = new XMLHttpRequest();
-    var backendUrl = 'http://172.30.7.156:8000';
+    var backendUrl = 'http://localhost:8000';
     const params = {
       'reuters_id': reutersId,
       'source': sourceId,
