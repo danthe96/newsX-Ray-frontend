@@ -1,8 +1,8 @@
 const BLUEMIX_NLP =
   "https://gateway.watsonplatform.net/natural-language-understanding/api/v1/analyze?version=2017-02-27"
 
-const user = "***REMOVED***";
-const pass = "***REMOVED***";
+const user = "**REMOVED**";
+const pass = "**REMOVED**";
 
 function makeBluemixRequest(payload) {
   const req = new XMLHttpRequest();

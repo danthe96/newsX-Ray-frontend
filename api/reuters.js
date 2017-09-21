@@ -1,6 +1,5 @@
-const REUTERS_ITEM_ID_TEMP = "tag:reuters.com,2017:newsml_KCN1BR06U:3"
 
-const REUTERS_TOKEN = "***REMOVED***"
+const REUTERS_TOKEN = "**REMOVED**"
 const REUTERS_API = `http://rmb.reuters.com/rmd/rest/json/search?mediaType=T&language=en&sort=score&token=${REUTERS_TOKEN}`
 const REUTERS_ITEM_API = `http://rmb.reuters.com/rmd/rest/json/item?token=${REUTERS_TOKEN}`
 
